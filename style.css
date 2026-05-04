@@ -1,6 +1,35 @@
 body {
-    font-style: Arial;
+    font-family: Arial, sans-serif;
 }
+
+h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+#mode-select {
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: bold;
+    border: none;
+    border-bottom: 2px solid #333;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+    padding: 0 2px;
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: center;
+    width: 1.2em;
+}
+
+#mode-select:hover {
+    color: #444;
+    border-bottom-color: #888;
+}
+
 #box {
     width: 700px;
     height: 450px;
@@ -8,6 +37,7 @@ body {
     border: 5px solid black;
     position: relative;
 }
+
 #redball {
     width: 20px;
     height: 20px;
@@ -15,6 +45,7 @@ body {
     border-radius: 10px;
     position: absolute;
 }
+
 #blueball {
     width: 20px;
     height: 20px;
@@ -22,6 +53,7 @@ body {
     border-radius: 10px;
     position: absolute;
 }
+
 .food {
     width: 10px;
     height: 10px;
