@@ -1,0 +1,31 @@
+body {
+    font-style: Arial;
+}
+#box {
+    width: 700px;
+    height: 450px;
+    background-color: yellow;
+    border: 5px solid black;
+    position: relative;
+}
+#redball {
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 10px;
+    position: absolute;
+}
+#blueball {
+    width: 20px;
+    height: 20px;
+    background-color: blue;
+    border-radius: 10px;
+    position: absolute;
+}
+.food {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: green;
+    position: absolute;
+}
