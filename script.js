@@ -1,6 +1,9 @@
-// ─── Refresh Rate ────────────────────────────────────────────────────────────────
-const foodRefreshInterval  = 15000 // ms
-const frameRefreshInterval = 10    // ms
+// ─── Config ───────────────────────────────────────────────────────────────────
+// Game Speed
+var gameSpeed = 1
+// Refresh Rate
+var foodRefreshInterval = 15000 / gameSpeed;
+const frameRefreshInterval = 10; // ms
 
 // ─── Game Mode ────────────────────────────────────────────────────────────────
 var gameMode = 1; // 1 or 2
@@ -10,10 +13,10 @@ var redball = null;
 var blueball = null;
 var foodElements = null;
 
-var redballVX = 0, redballVY = 0, redspeed = 0.5;
+var redballVX = 0, redballVY = 0, redspeed = gameSpeed * 0.5;
 var redWinsCount = 0, redballX = 0, redballY = 0;
 
-var blueballVX = 0, blueballVY = 0, bluespeed = 0.5;
+var blueballVX = 0, blueballVY = 0, bluespeed = gameSpeed * 0.5;
 var blueWinsCount = 0, blueballX = 680, blueballY = 430;
 
 // ─── 1P State ─────────────────────────────────────────────────────────────────
@@ -111,12 +114,12 @@ function setupScoreboard() {
         label1.style.color = "#1a8c1a";
         label1.innerHTML = "Score:";
         value1.style.color = "#1a8c1a";
-        value1.innerHTML = lastScore !== null ? formatTime(lastScore) : "—";
+        value1.innerHTML = lastScore !== null ? formatTime(gameSpeed*lastScore) : "—";
 
         label2.style.color = "#b8860b";
         label2.innerHTML = "Best:";
         value2.style.color = "#b8860b";
-        value2.innerHTML = highScore !== null ? formatTime(highScore) : "—";
+        value2.innerHTML = highScore !== null ? formatTime(gameSpeed*highScore) : "—";
     }
 }
 
@@ -177,27 +180,27 @@ function getKeyAndMove(e) {
     var isMoveKey = false;
 
     switch (key_code) {
-        case 65: moveredLeft();  isMoveKey = true; break; // A
-        case 87: moveredUp();    isMoveKey = true; break; // W
+        case 65: moveredLeft(); isMoveKey = true; break; // A
+        case 87: moveredUp(); isMoveKey = true; break; // W
         case 68: moveredRight(); isMoveKey = true; break; // D
-        case 83: moveredDown();  isMoveKey = true; break; // S
+        case 83: moveredDown(); isMoveKey = true; break; // S
 
         case 37: // left arrow
-            if (gameMode === 2) moveblueLeft();  else moveredLeft();
+            if (gameMode === 2) moveblueLeft(); else moveredLeft();
             isMoveKey = true; break;
         case 38: // up arrow
-            if (gameMode === 2) moveblueUp();    else moveredUp();
+            if (gameMode === 2) moveblueUp(); else moveredUp();
             isMoveKey = true; break;
         case 39: // right arrow
             if (gameMode === 2) moveblueRight(); else moveredRight();
             isMoveKey = true; break;
         case 40: // down arrow
-            if (gameMode === 2) moveblueDown();  else moveredDown();
+            if (gameMode === 2) moveblueDown(); else moveredDown();
             isMoveKey = true; break;
     }
 
     if (gameMode === 1 && !stopwatchRunning && isMoveKey) {
-        stopwatchStart   = Date.now();
+        stopwatchStart = Date.now();
         stopwatchRunning = true;
     }
 }
