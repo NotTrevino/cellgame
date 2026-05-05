@@ -1,3 +1,7 @@
+// ─── Refresh Rate ────────────────────────────────────────────────────────────────
+const foodRefreshInterval  = 15000 // ms
+const frameRefreshInterval = 10    // ms
+
 // ─── Game Mode ────────────────────────────────────────────────────────────────
 var gameMode = 1; // 1 or 2
 
@@ -154,7 +158,7 @@ function spawnfood() {
     }
 }
 
-setInterval(spawnfood, 15000);
+setInterval(spawnfood, foodRefreshInterval);
 
 // ─── Movement Functions ───────────────────────────────────────────────────────
 function moveredLeft() { redballVX = -redspeed; redballVY = 0; }
@@ -418,4 +422,4 @@ function updateBalls() {
     if (foodElements.length === 0) spawnfood();
 }
 
-setInterval(updateBalls, 10);
+setInterval(updateBalls, frameRefreshInterval);
