@@ -258,7 +258,7 @@ function getRadius(ball) {
 }
 
 function formatTime(ms) {
-    return (ms / (1000*gameSpeed)).toFixed(2) + "s";
+    return (ms / (1000 * gameSpeed)).toFixed(2) + "s";
 }
 
 // ─── Food Spawning ────────────────────────────────────────────────────────────
@@ -539,14 +539,13 @@ function updateBalls() {
         if (!food) continue;
 
         var fL = parseInt(food.style.left), fR = fL + 10;
-        var fT2 = parseInt(food.style.top), fB2 = fT2 + 10;
+        var fT = parseInt(food.style.top), fB = fT + 10;
 
-        if (rR >= fR && rL <= fL && rB >= fB2 && rT <= fT2) {
+        if (rR >= fR && rL <= fL && rB >= fB && rT <= fT) {
             redballgrowth();
             food.remove();
-            continue;
         }
-        if (bR >= fR && bL <= fL && bB >= fB2 && bT <= fT2) {
+        if (bR >= fR && bL <= fL && bB >= fB && bT <= fT) {
             blueballgrowth();
             food.remove();
         }
@@ -563,7 +562,7 @@ function updateBalls() {
         redballgrowth();
         blueball.remove();
     }
-    if (bR >= rR && bL <= rL && bB >= rB && bT <= rT && getRadius(blueball) > getRadius(redball)) {
+    else if (bR >= rR && bL <= rL && bB >= rB && bT <= rT && getRadius(blueball) > getRadius(redball)) {
         blueballgrowth();
         redball.remove();
     }
@@ -572,8 +571,9 @@ function updateBalls() {
     var finalRedR = getRadius(redball);
     var finalBlueR = getRadius(blueball);
 
-    if (finalRedR === 225 || isNaN(finalBlueR)) { redwins(); return; }
-    if (finalBlueR === 225 || isNaN(finalRedR)) { bluewins(); return; }
+    if (isNaN(finalBlueR) || (finalRedR === 225 && finalRedR > finalBlueR)) { redwins(); return; }
+    if (isNaN(finalRedR) || (finalBlueR === 225 && finalBlueR > finalRedR)) { bluewins(); return; }
+    else if (finalRedR === 225 && finalBlueR === 225) { fullReset(); }
 
     // Respawn food if exhausted
     if (foodElements.length === 0) spawnfood();
