@@ -329,6 +329,8 @@ function bluewins() {
 
 // ─── Main Update Loop ─────────────────────────────────────────────────────────
 function updateBalls() {
+    if (gameMode === 1 && !stopwatchRunning) return;
+
     var redR = getRadius(redball);
     var blueR = getRadius(blueball);
 
