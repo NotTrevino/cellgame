@@ -1,7 +1,7 @@
 // ─── Config ───────────────────────────────────────────────────────────────────
 // Game Speed
 var gameSpeed = 1
-var P1_advatage = 2
+var P1_advatage = 1
 // Refresh Rate
 var foodRefreshInterval = 15000 / gameSpeed;
 const frameRefreshInterval = 10; // ms
@@ -258,7 +258,7 @@ function getRadius(ball) {
 }
 
 function formatTime(ms) {
-    return (ms / 1000).toFixed(2) + "s";
+    return (ms / (1000*gameSpeed)).toFixed(2) + "s";
 }
 
 // ─── Food Spawning ────────────────────────────────────────────────────────────
@@ -302,6 +302,8 @@ function getKeyAndMove(e) {
         case 68: moveredRight(); isMoveKey = true; break; // D
         case 83: moveredDown(); isMoveKey = true; break;  // S
         case 82: fullReset(); break; // R
+        case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // R
+        case 72: P1_advatage += 1; break; // R
 
         case 37: // left arrow
             if (gameMode === 2) moveblueLeft(); else moveredLeft();

@@ -13,7 +13,7 @@
       <td colspan="4">
         <h1 align="center">
           <span id="local-prefix" style="display: none;">Local </span>
-          <select id="mode-select" onchange="switchMode(this.value)">
+          <select id="mode-select" onchange="switchMode(this.value); this.blur();">
             <option value="1">1</option>
             <option value="2">2</option>
           </select>
