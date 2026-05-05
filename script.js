@@ -190,7 +190,12 @@ async function loadLeaderboard() {
 }
 
 async function login() {
-    await sb.auth.signInWithOAuth({ provider: "google" });
+    await sb.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+            redirectTo: "https://nottrevino.github.io/cellgame"
+        }
+    });
 }
 
 async function logout() {
