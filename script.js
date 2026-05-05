@@ -33,6 +33,12 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 // ─── Auth State ───────────────────────────────────────────────────────────────
 var currentUser = null;
 
+supabase.auth.onAuthStateChange(function (event, session) {
+    currentUser = session ? session.user : null;
+    renderAuthBar();
+    if (event === "SIGNED_IN") loadLeaderboard();
+});
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 function init() {
     redball = document.getElementById("redball");
@@ -54,20 +60,7 @@ function init() {
     loadLeaderboard();
 }
 
-// Registered BEFORE the auth listener so a bad auth call can never block init
 window.onload = init;
-
-// Auth state listener — wrapped so any Supabase error never aborts the script
-try {
-    supabase.auth.onAuthStateChange(function (event, session) {
-        currentUser = session ? session.user : null;
-        renderAuthBar();
-        if (event === "SIGNED_IN") loadLeaderboard();
-    });
-} catch (e) {
-    console.warn("Auth listener setup failed:", e);
-}
-
 
 // ─── Mode Switching ────────────────────────────────────────────────────────────
 function switchMode(val) {
