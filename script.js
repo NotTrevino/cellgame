@@ -114,12 +114,12 @@ function setupScoreboard() {
         label1.style.color = "#1a8c1a";
         label1.innerHTML = "Score:";
         value1.style.color = "#1a8c1a";
-        value1.innerHTML = lastScore !== null ? formatTime(gameSpeed*lastScore) : "—";
+        value1.innerHTML = lastScore !== null ? formatTime(gameSpeed * lastScore) : "—";
 
         label2.style.color = "#b8860b";
         label2.innerHTML = "Best:";
         value2.style.color = "#b8860b";
-        value2.innerHTML = highScore !== null ? formatTime(gameSpeed*highScore) : "—";
+        value2.innerHTML = highScore !== null ? formatTime(gameSpeed * highScore) : "—";
     }
 }
 
@@ -180,10 +180,11 @@ function getKeyAndMove(e) {
     var isMoveKey = false;
 
     switch (key_code) {
-        case 65: moveredLeft(); isMoveKey = true; break; // A
-        case 87: moveredUp(); isMoveKey = true; break; // W
+        case 65: moveredLeft(); isMoveKey = true; break;  // A
+        case 87: moveredUp(); isMoveKey = true; break;    // W
         case 68: moveredRight(); isMoveKey = true; break; // D
-        case 83: moveredDown(); isMoveKey = true; break; // S
+        case 83: moveredDown(); isMoveKey = true; break;  // S
+        case 82: fullReset(); break; // R
 
         case 37: // left arrow
             if (gameMode === 2) moveblueLeft(); else moveredLeft();
@@ -197,6 +198,7 @@ function getKeyAndMove(e) {
         case 40: // down arrow
             if (gameMode === 2) moveblueDown(); else moveredDown();
             isMoveKey = true; break;
+
     }
 
     if (gameMode === 1 && !stopwatchRunning && isMoveKey) {
