@@ -1,42 +1,46 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
-  </head>
-  <body onkeydown="getKeyAndMove(event)">
-    <table style="width: 700px;" align="center">
-      <tr>
-        <td colspan="4">
-          <h1 align="center">
-            <select id="mode-select" onchange="switchMode(this.value)">
-              <option value="1">1</option>
-              <option value="2">2</option>
-            </select>
-            Player Cell Game
-          </h1>
-        </td>
-      </tr>
-      <tr>
-        <td id="label1" width="25%"></td>
-        <td id="value1" style="font-size: 30px;"></td>
-        <td id="label2" width="25%"></td>
-        <td id="value2" style="font-size: 30px;"></td>
-      </tr>
-      <tr>
-        <td colspan="4">
-          <div id="box">
-            <div id="redball"></div>
-            <div id="blueball"></div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="4" align="center" id="instructions">
-          Use WASD and arrow keys to move.<br>
-          Reach maximum size first or eat the other ball to win!
-        </td>
-      </tr>
-    </table>
-  </body>
+
+<head>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body onkeydown="getKeyAndMove(event)">
+  <table style="width: 700px;" align="center">
+    <tr>
+      <td colspan="4">
+        <h1 align="center">
+          <span id="local-prefix" style="display: none;">Local </span>
+          <select id="mode-select" onchange="switchMode(this.value)">
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+          Player Cell Game
+        </h1>
+      </td>
+    </tr>
+    <tr>
+      <td id="label1" width="25%"></td>
+      <td id="value1" style="font-size: 30px;"></td>
+      <td id="label2" width="25%"></td>
+      <td id="value2" style="font-size: 30px;"></td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div id="box">
+          <div id="redball"></div>
+          <div id="blueball"></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4" align="center" id="instructions">
+        Use WASD and arrow keys to move.<br>
+        Reach maximum size first or eat the other ball to win!
+      </td>
+    </tr>
+  </table>
+</body>
+
 </html>
