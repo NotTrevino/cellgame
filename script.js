@@ -307,8 +307,10 @@ function getKeyAndMove(e) {
         case 68: moveredRight(); isMoveKey = true; break; // D
         case 83: moveredDown(); isMoveKey = true; break;  // S
         case 82: fullReset(); break; // R
-        case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // R
-        case 72: P1_advatage += 1; break; // R
+        case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // G
+        case 72: P1_advatage += 1; break; // H
+        case 84: gameSpeed = Math.max(P1_advatage - 1, 1); break; // T
+        case 89: gameSpeed += 1; break; // Y
 
         case 37: // left arrow
             if (gameMode === 2) moveblueLeft(); else moveredLeft();
@@ -393,6 +395,15 @@ function blueballgrowth() {
     blueball.style.borderRadius = size + "px";
     if (blueballX > 700 - size * 2) blueballX = 700 - size * 2;
     if (blueballY > 450 - size * 2) blueballY = 450 - size * 2;
+}
+
+function tryEat(ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) {
+    if (bR >= fR && bL <= fL && bB >= fB && bT <= fT && getRadius(ball) > getRadius(food)) {
+        growthFn();
+        food.remove();
+        return true;
+    }
+    return false;
 }
 
 // ─── Reset Functions ──────────────────────────────────────────────────────────
@@ -546,14 +557,8 @@ function updateBalls() {
         var fL = parseInt(food.style.left), fR = fL + 10;
         var fT = parseInt(food.style.top), fB = fT + 10;
 
-        if (rR >= fR && rL <= fL && rB >= fB && rT <= fT) {
-            redballgrowth();
-            food.remove();
-        }
-        if (bR >= fR && bL <= fL && bB >= fB && bT <= fT) {
-            blueballgrowth();
-            food.remove();
-        }
+        tryEat(redball, redballgrowth, rL, rR, rT, rB, fL, fR, fT, fB, food);
+        tryEat(blueball, blueballgrowth, bL, bR, bT, bB, fL, fR, fT, fB, food);
     }
 
     // ── Ball-on-ball collision ──────────────────────────────────────────────
@@ -563,14 +568,8 @@ function updateBalls() {
     bL = parseInt(blueball.style.left); bR = bL + getRadius(blueball) * 2;
     bT = parseInt(blueball.style.top); bB = bT + getRadius(blueball) * 2;
 
-    if (rR >= bR && rL <= bL && rB >= bB && rT <= bT && getRadius(redball) > getRadius(blueball)) {
-        redballgrowth();
-        blueball.remove();
-    }
-    else if (bR >= rR && bL <= rL && bB >= rB && bT <= rT && getRadius(blueball) > getRadius(redball)) {
-        blueballgrowth();
-        redball.remove();
-    }
+    tryEat(redball, redballgrowth, rL, rR, rT, rB, bL, bR, bT, bB, blueball);
+    tryEat(blueball, blueballgrowth, bL, bR, bT, bB, rL, rR, rT, rB, redball); 
 
     // ── Win conditions ──────────────────────────────────────────────────────
     var finalRedR = getRadius(redball);
