@@ -29,6 +29,16 @@ const supabaseUrl = "https://znmnnttmddhgavfewwhp.supabase.co";
 const supabaseKey = "sb_publishable_kUXQNorAEPpAZAsOVP7KNA_8jh2RHgv";
 
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// ─── Auth State ───────────────────────────────────────────────────────────────
+var currentUser = null;
+
+supabase.auth.onAuthStateChange(function (event, session) {
+    currentUser = session ? session.user : null;
+    renderAuthBar();
+    if (event === "SIGNED_IN") loadLeaderboard();
+});
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 function init() {
     redball = document.getElementById("redball");
@@ -44,7 +54,9 @@ function init() {
 
     resetballpos();
     setupScoreboard();
+    updateInstructions();
     spawnfood();
+    checkUser();
     loadLeaderboard();
 }
 
@@ -124,7 +136,8 @@ function setupScoreboard() {
         label2.style.color = "#b8860b";
         label2.innerHTML = "Best:";
         value2.style.color = "#b8860b";
-        value2.innerHTML = highScore !== null ? formatTime(gameSpeed * highScore) : "—";
+        var bestText = highScore !== null ? formatTime(gameSpeed * highScore) : "—";
+        value2.innerHTML = bestText + ' <button onclick="submitScore()" style="font-size:12px;vertical-align:middle;margin-left:6px;">Submit</button>';
     }
 }
 
@@ -142,22 +155,92 @@ function updateInstructions() {
 async function loadLeaderboard() {
     const { data, error } = await supabase
         .from("scores")
-        .select("time_ms")
+        .select("username, time_ms, user_id")
         .order("time_ms", { ascending: true })
         .limit(10);
 
-    if (!data) return;
+    var body = document.getElementById("leaderboard-body");
+    if (!body) return;
 
-    console.log("Top 10:", data);
+    if (error || !data || data.length === 0) {
+        body.innerHTML = '<tr><td colspan="3" align="center" style="padding:8px;color:#888;">No scores yet — be the first!</td></tr>';
+        return;
+    }
+
+    body.innerHTML = "";
+    data.forEach(function (row, i) {
+        var isMe = currentUser && row.user_id === currentUser.id;
+        var tr = document.createElement("tr");
+        if (isMe) tr.style.fontWeight = "bold";
+        if (i === 0) tr.style.background = "#fffbe6";
+        tr.innerHTML =
+            '<td style="padding:6px 14px;border:1px solid #ccc;text-align:center;">' + (i + 1) + '</td>' +
+            '<td style="padding:6px 14px;border:1px solid #ccc;">' + row.username + (isMe ? " ★" : "") + '</td>' +
+            '<td style="padding:6px 14px;border:1px solid #ccc;text-align:right;">' + formatTime(row.time_ms) + '</td>';
+        body.appendChild(tr);
+    });
 }
 
 async function login() {
-    await supabase.auth.signInWithOAuth({
-        provider: "google"
-    });
+    await supabase.auth.signInWithOAuth({ provider: "google" });
 }
+
 async function logout() {
     await supabase.auth.signOut();
+    currentUser = null;
+    renderAuthBar();
+}
+
+async function checkUser() {
+    const { data: { user } } = await supabase.auth.getUser();
+    currentUser = user || null;
+    renderAuthBar();
+}
+
+function renderAuthBar() {
+    var bar = document.getElementById("auth-bar");
+    if (!bar) return;
+    if (currentUser) {
+        var name = localStorage.getItem("cell_username") ||
+            (currentUser.user_metadata && currentUser.user_metadata.full_name) ||
+            currentUser.email || "Player";
+        bar.innerHTML =
+            'Signed in as <strong>' + name + '</strong>' +
+            ' &nbsp;<button onclick="logout()" style="font-size:12px;">Logout</button>' +
+            ' <button onclick="resetUsername()" style="font-size:12px;">Change name</button>';
+    } else {
+        bar.innerHTML = '<button onclick="login()">Login with Google</button>';
+    }
+}
+
+function getUsername() {
+    var stored = localStorage.getItem("cell_username");
+    if (stored) return stored;
+    var defaultName = (currentUser && currentUser.user_metadata && currentUser.user_metadata.full_name)
+        || (currentUser && currentUser.email) || "Player";
+    var name = prompt("Choose a leaderboard display name:", defaultName);
+    if (!name || !name.trim()) return null;
+    name = name.trim().slice(0, 20);
+    localStorage.setItem("cell_username", name);
+    renderAuthBar();
+    return name;
+}
+
+function resetUsername() {
+    localStorage.removeItem("cell_username");
+    var name = getUsername();
+    if (name) renderAuthBar();
+}
+
+async function submitScore() {
+    if (highScore === null) { alert("Win a game first!"); return; }
+    if (!currentUser) {
+        if (confirm("You need to log in to save your score.\nLog in with Google?")) login();
+        return;
+    }
+    var username = getUsername();
+    if (!username) return;
+    await saveScore(highScore, username);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -315,21 +398,29 @@ function resetballpos() {
 }
 
 // ─── Win Functions ────────────────────────────────────────────────────────────
-async function saveScore(ms) {
-    if (ms < 2000) return; // basic anti-cheat (2s impossible)
+async function saveScore(ms, username) {
+    if (ms < 2000) return; // basic anti-cheat
+    if (!currentUser) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        alert("Login required to save score");
-        return;
-    }
+    // Only accept a provided username, or quietly skip
+    if (!username) return;
 
-    await supabase.from("scores").insert([
-        {
-            user_id: user.id,
-            time_ms: ms
-        }
-    ]);
+    // Check if existing DB score is already better
+    const { data: existing } = await supabase
+        .from("scores")
+        .select("time_ms")
+        .eq("user_id", currentUser.id)
+        .single();
+
+    if (existing && existing.time_ms <= ms) return; // not a new personal best
+
+    await supabase.from("scores").upsert({
+        user_id: currentUser.id,
+        username: username,
+        time_ms: ms
+    }, { onConflict: "user_id" });
+
+    loadLeaderboard();
 }
 function redwins() {
     // Recreate blueball if it was eaten
@@ -344,9 +435,18 @@ function redwins() {
         if (stopwatchRunning) {
             var elapsed = Date.now() - stopwatchStart;
             lastScore = elapsed;
-            if (highScore === null || elapsed < highScore) { highScore = elapsed; saveScore(elapsed) }
+            if (highScore === null || elapsed < highScore) {
+                highScore = elapsed;
+                // Auto-save if logged in and username already set
+                if (currentUser) {
+                    var storedName = localStorage.getItem("cell_username") ||
+                        (currentUser.user_metadata && currentUser.user_metadata.full_name);
+                    if (storedName) saveScore(elapsed, storedName).then(loadLeaderboard);
+                }
+            }
             document.getElementById("value1").innerHTML = formatTime(elapsed);
-            document.getElementById("value2").innerHTML = formatTime(highScore);
+            var bestText = formatTime(highScore);
+            document.getElementById("value2").innerHTML = bestText + ' <button onclick="submitScore()" style="font-size:12px;vertical-align:middle;margin-left:6px;">Submit</button>';
         }
         stopwatchRunning = false;
         stopwatchStart = null;
