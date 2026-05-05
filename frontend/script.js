@@ -24,6 +24,13 @@ function init() {
     blueball = document.getElementById("blueball");
     foodElements = document.getElementsByClassName("food");
 
+    var sel = document.getElementById("mode-select");
+    if (sel) {
+        gameMode = parseInt(sel.value);
+        var prefix = document.getElementById("local-prefix");
+        if (prefix) prefix.style.display = (gameMode === 2) ? "inline" : "none";
+    }
+
     resetballpos();
     setupScoreboard();
     spawnfood();
@@ -39,9 +46,7 @@ function switchMode(val) {
 
     // Show/hide "Local " prefix
     var prefix = document.getElementById("local-prefix");
-    if (prefix) {
-        prefix.style.display = (gameMode === 2) ? "inline" : "none";
-    }
+    if (prefix) prefix.style.display = (gameMode === 2) ? "inline" : "none";
 
     fullReset();
 }
@@ -168,27 +173,27 @@ function getKeyAndMove(e) {
     var isMoveKey = false;
 
     switch (key_code) {
-        case 65: moveredLeft(); isMoveKey = true; break;  // A
-        case 87: moveredUp(); isMoveKey = true; break;    // W
+        case 65: moveredLeft();  isMoveKey = true; break; // A
+        case 87: moveredUp();    isMoveKey = true; break; // W
         case 68: moveredRight(); isMoveKey = true; break; // D
-        case 83: moveredDown(); isMoveKey = true; break;  // S
+        case 83: moveredDown();  isMoveKey = true; break; // S
 
         case 37: // left arrow
-            if (gameMode === 2) moveblueLeft(); else moveredLeft();
+            if (gameMode === 2) moveblueLeft();  else moveredLeft();
             isMoveKey = true; break;
         case 38: // up arrow
-            if (gameMode === 2) moveblueUp(); else moveredUp();
+            if (gameMode === 2) moveblueUp();    else moveredUp();
             isMoveKey = true; break;
         case 39: // right arrow
             if (gameMode === 2) moveblueRight(); else moveredRight();
             isMoveKey = true; break;
         case 40: // down arrow
-            if (gameMode === 2) moveblueDown(); else moveredDown();
+            if (gameMode === 2) moveblueDown();  else moveredDown();
             isMoveKey = true; break;
     }
 
     if (gameMode === 1 && !stopwatchRunning && isMoveKey) {
-        stopwatchStart = Date.now();
+        stopwatchStart   = Date.now();
         stopwatchRunning = true;
     }
 }
