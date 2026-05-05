@@ -28,16 +28,10 @@ var lastScore = null; // last winning ms (shown when stopwatch is paused)
 const supabaseUrl = "https://znmnnttmddhgavfewwhp.supabase.co";
 const supabaseKey = "sb_publishable_kUXQNorAEPpAZAsOVP7KNA_8jh2RHgv";
 
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ─── Auth State ───────────────────────────────────────────────────────────────
 var currentUser = null;
-
-supabase.auth.onAuthStateChange(function (event, session) {
-    currentUser = session ? session.user : null;
-    renderAuthBar();
-    if (event === "SIGNED_IN") loadLeaderboard();
-});
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 function init() {
@@ -60,7 +54,20 @@ function init() {
     loadLeaderboard();
 }
 
+// Registered BEFORE the auth listener so a bad auth call can never block init
 window.onload = init;
+
+// Auth state listener — wrapped so any Supabase error never aborts the script
+try {
+    sb.auth.onAuthStateChange(function (event, session) {
+        currentUser = session ? session.user : null;
+        renderAuthBar();
+        if (event === "SIGNED_IN") loadLeaderboard();
+    });
+} catch (e) {
+    console.warn("Auth listener setup failed:", e);
+}
+
 
 // ─── Mode Switching ────────────────────────────────────────────────────────────
 function switchMode(val) {
@@ -153,7 +160,7 @@ function updateInstructions() {
 }
 
 async function loadLeaderboard() {
-    const { data, error } = await supabase
+    const { data, error } = await sb
         .from("scores")
         .select("username, time_ms, user_id")
         .order("time_ms", { ascending: true })
@@ -182,17 +189,17 @@ async function loadLeaderboard() {
 }
 
 async function login() {
-    await supabase.auth.signInWithOAuth({ provider: "google" });
+    await sb.auth.signInWithOAuth({ provider: "google" });
 }
 
 async function logout() {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     currentUser = null;
     renderAuthBar();
 }
 
 async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await sb.auth.getUser();
     currentUser = user || null;
     renderAuthBar();
 }
@@ -406,7 +413,7 @@ async function saveScore(ms, username) {
     if (!username) return;
 
     // Check if existing DB score is already better
-    const { data: existing } = await supabase
+    const { data: existing } = await sb
         .from("scores")
         .select("time_ms")
         .eq("user_id", currentUser.id)
@@ -414,7 +421,7 @@ async function saveScore(ms, username) {
 
     if (existing && existing.time_ms <= ms) return; // not a new personal best
 
-    await supabase.from("scores").upsert({
+    await sb.from("scores").upsert({
         user_id: currentUser.id,
         username: username,
         time_ms: ms
