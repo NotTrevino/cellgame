@@ -25,6 +25,10 @@ var stopwatchRunning = false;
 var highScore = null; // best (lowest) ms
 var lastScore = null; // last winning ms (shown when stopwatch is paused)
 
+const supabaseUrl = "https://znmnnttmddhgavfewwhp.supabase.co";
+const supabaseKey = "sb_publishable_kUXQNorAEPpAZAsOVP7KNA_8jh2RHgv";
+
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 // ─── Init ─────────────────────────────────────────────────────────────────────
 function init() {
     redball = document.getElementById("redball");
@@ -41,6 +45,7 @@ function init() {
     resetballpos();
     setupScoreboard();
     spawnfood();
+    loadLeaderboard();
 }
 
 window.onload = init;
@@ -132,6 +137,27 @@ function updateInstructions() {
         instr.innerHTML = "Use WASD and arrow keys to move.<br>"
             + "Reach maximum size first or eat the other ball to win!";
     }
+}
+
+async function loadLeaderboard() {
+    const { data, error } = await supabase
+        .from("scores")
+        .select("time_ms")
+        .order("time_ms", { ascending: true })
+        .limit(10);
+
+    if (!data) return;
+
+    console.log("Top 10:", data);
+}
+
+async function login() {
+    await supabase.auth.signInWithOAuth({
+        provider: "google"
+    });
+}
+async function logout() {
+    await supabase.auth.signOut();
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -289,6 +315,22 @@ function resetballpos() {
 }
 
 // ─── Win Functions ────────────────────────────────────────────────────────────
+async function saveScore(ms) {
+    if (ms < 2000) return; // basic anti-cheat (2s impossible)
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        alert("Login required to save score");
+        return;
+    }
+
+    await supabase.from("scores").insert([
+        {
+            user_id: user.id,
+            time_ms: ms
+        }
+    ]);
+}
 function redwins() {
     // Recreate blueball if it was eaten
     ensureBall("blueball");
@@ -302,7 +344,7 @@ function redwins() {
         if (stopwatchRunning) {
             var elapsed = Date.now() - stopwatchStart;
             lastScore = elapsed;
-            if (highScore === null || elapsed < highScore) highScore = elapsed;
+            if (highScore === null || elapsed < highScore) { highScore = elapsed; saveScore(elapsed) }
             document.getElementById("value1").innerHTML = formatTime(elapsed);
             document.getElementById("value2").innerHTML = formatTime(highScore);
         }
