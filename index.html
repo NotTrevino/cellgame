@@ -5,13 +5,6 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="script.js" defer></script>
-  <style>
-    /* Failsafe: ensures layout works even if style.css fails to load */
-    #box       { width:700px; height:450px; background-color:yellow; border:5px solid black; position:relative; }
-    #redball   { width:20px; height:20px; background-color:red;  border-radius:10px; position:absolute; }
-    #blueball  { width:20px; height:20px; background-color:blue; border-radius:10px; position:absolute; }
-    .food      { width:10px; height:10px; background-color:green; border-radius:5px; position:absolute; }
-  </style>
 </head>
 
 <body onkeydown="getKeyAndMove(event)">
@@ -49,11 +42,9 @@
       </td>
     </tr>
   </table>
-
   <div id="auth-bar" align="center" style="margin-top:14px;font-family:Arial,sans-serif;font-size:14px;">
     <!-- populated by renderAuthBar() -->
   </div>
-
   <h3 align="center" style="font-family:Arial,sans-serif;margin-top:22px;margin-bottom:8px;">🏆 Leaderboard — Top 10</h3>
   <table align="center" style="width:420px;border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;">
     <thead>
