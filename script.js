@@ -13,7 +13,7 @@ var redball = null;
 var blueball = null;
 var foodElements = null;
 
-var redballVX = 0, redballVY = 0, redspeed = gameSpeed * 0.5;
+var redballVX = 0, redballVY = 0, redspeed = gameSpeed * 0.5 * 5;
 var redWinsCount = 0, redballX = 0, redballY = 0;
 
 var blueballVX = 0, blueballVY = 0, bluespeed = gameSpeed * 0.5;
