@@ -1,6 +1,7 @@
 // ─── Config ───────────────────────────────────────────────────────────────────
 // Game Speed
 var gameSpeed = 1
+var P1_advatage = 2
 // Refresh Rate
 var foodRefreshInterval = 15000 / gameSpeed;
 const frameRefreshInterval = 10; // ms
@@ -13,7 +14,7 @@ var redball = null;
 var blueball = null;
 var foodElements = null;
 
-var redballVX = 0, redballVY = 0, redspeed = gameSpeed * 0.5 * 5;
+var redballVX = 0, redballVY = 0, redspeed = P1_advatage * gameSpeed * 0.5;
 var redWinsCount = 0, redballX = 0, redballY = 0;
 
 var blueballVX = 0, blueballVY = 0, bluespeed = gameSpeed * 0.5;
@@ -517,8 +518,8 @@ function updateBalls() {
     blueball.style.top = blueballY + "px";
 
     // Update speeds (proportional to size)
-    redspeed = (1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5;
-    bluespeed = (1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5;
+    redspeed = P1_advatage * gameSpeed * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
+    bluespeed = gameSpeed * ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
 
     // Live stopwatch display (1P)
     if (gameMode === 1 && stopwatchRunning) {
