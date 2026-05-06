@@ -307,8 +307,8 @@ function getKeyAndMove(e) {
         case 68: moveredRight(); isMoveKey = true; break; // D
         case 83: moveredDown(); isMoveKey = true; break;  // S
         case 82: fullReset(); break; // R
-        case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // G
-        case 72: P1_advatage += 1; break;                           // H
+        //case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // G
+        //case 72: P1_advatage += 1; break;                           // H
         case 84: gameSpeed = Math.max(P1_advatage - 1, 1); break; // T
         case 89: gameSpeed += 1; break;                           // Y
 
