@@ -16,10 +16,10 @@ var foodElements = null;
 var foodIntervalId = null;
 var frameIntervalId = null;
 
-var redballVX = 0, redballVY = 0, redspeed = P1_advatage * gameSpeed * 0.5;
+var redballVX = 0, redballVY = 0, redspeed = P1_advatage * 0.5;
 var redWinsCount = 0, redballX = 0, redballY = 0;
 
-var blueballVX = 0, blueballVY = 0, bluespeed = gameSpeed * 0.5;
+var blueballVX = 0, blueballVY = 0, bluespeed = 0.5;
 var blueWinsCount = 0, blueballX = 680, blueballY = 430;
 
 // ─── 1P State ─────────────────────────────────────────────────────────────────
@@ -54,6 +54,7 @@ function init() {
     updateInstructions();
     spawnfood();
     startIntervals();
+    if (gameMode === 0) { stopwatchStart = Date.now(); stopwatchRunning = true; }
     checkUser();
     loadLeaderboard();
 }
