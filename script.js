@@ -309,7 +309,7 @@ function getKeyAndMove(e) {
         case 82: fullReset(); break; // R
         //case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // G
         //case 72: P1_advatage += 1; break;                           // H
-        case 189 || 109: gameSpeed = Math.max(P1_advatage - 1, 1); break; // -
+        case 189 || 109: gameSpeed = Math.max(gameSpeed - 1, 1); break; // -
         case 187 || 107: gameSpeed += 1; break;                           // +
 
         case 37: // left arrow
