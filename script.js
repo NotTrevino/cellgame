@@ -78,7 +78,7 @@ function switchMode(val) {
 
     // Show/hide "Local " prefix
     var prefix = document.getElementById("local-prefix");
-    if (prefix) prefix.style.display = (gameMode === 2) ? "inline" : "none";
+    if (prefix) prefix.style.visibility = (gameMode === 2) ? "visible" : "hidden";
 
     fullReset();
 }
