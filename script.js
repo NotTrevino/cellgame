@@ -374,32 +374,64 @@ function updateAI() {
 }
 
 // ─── Growth Functions ─────────────────────────────────────────────────────────
-function redballgrowth() {
+function redballgrowth(directions = "LTRB") {
     var r = getRadius(redball);
     if (isNaN(r) || r >= 225) return;
+    var growth = 1;
     var size = r + 1;
     redball.style.width = size * 2 + "px";
     redball.style.height = size * 2 + "px";
     redball.style.borderRadius = size + "px";
+    // growth direction
+    redballX -= growth; // offset fix
+    redballY -= growth; // offset fix
+    if (directions.includes("L")) redballX -= growth;
+    if (directions.includes("R")) redballX += growth;
+    if (directions.includes("T")) redballY -= growth;
+    if (directions.includes("B")) redballY += growth;
     // Clamp position after growing
-    if (redballX > 700 - size * 2) redballX = 700 - size * 2;
-    if (redballY > 450 - size * 2) redballY = 450 - size * 2;
+    if (redballX > 700 - size * 2) redballX = 700 - size * 2; // Right
+    if (redballY > 450 - size * 2) redballY = 450 - size * 2; // Bottom
+    if (redballX < 0) redballX = 0; // Left
+    if (redballY < 0) redballY = 0; // Top
 }
 
-function blueballgrowth() {
+function blueballgrowth(directions = "LTRB") {
     var r = getRadius(blueball);
     if (isNaN(r) || r >= 225) return;
+    var growth = 1;
     var size = r + 1;
     blueball.style.width = size * 2 + "px";
     blueball.style.height = size * 2 + "px";
     blueball.style.borderRadius = size + "px";
-    if (blueballX > 700 - size * 2) blueballX = 700 - size * 2;
-    if (blueballY > 450 - size * 2) blueballY = 450 - size * 2;
+    // growth direction
+    blueballX -= growth; // offset fix
+    blueballY -= growth; // offset fix
+    if (directions.includes("L")) blueballX -= growth;
+    if (directions.includes("R")) blueballX += growth;
+    if (directions.includes("T")) blueballY -= growth;
+    if (directions.includes("B")) blueballY += growth;
+    // Clamp position after growing
+    if (blueballX > 700 - size * 2) blueballX = 700 - size * 2; // Right
+    if (blueballY > 450 - size * 2) blueballY = 450 - size * 2; // Bottom
+    if (blueballX < 0) blueballX = 0; // Left
+    if (blueballY < 0) blueballY = 0; // Top
 }
 
 function tryEat(ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) {
     if (bR >= fR && bL <= fL && bB >= fB && bT <= fT && getRadius(ball) > getRadius(food)) {
-        growthFn();
+        var dirs = "LTRB";
+
+        var bCenterX = (bL + bR) / 2;
+        var bCenterY = (bT + bB) / 2;
+
+        // food position relation
+        if (fB < bCenterY) dirs = dirs.replace("B", ""); // food above center
+        if (fT > bCenterY) dirs = dirs.replace("T", ""); // food below center
+        if (fR < bCenterX) dirs = dirs.replace("R", ""); // food left of center
+        if (fL > bCenterX) dirs = dirs.replace("L", ""); // food right of center
+
+        growthFn(dirs);
         food.remove();
         return true;
     }
@@ -569,7 +601,7 @@ function updateBalls() {
     bT = parseInt(blueball.style.top); bB = bT + getRadius(blueball) * 2;
 
     tryEat(redball, redballgrowth, rL, rR, rT, rB, bL, bR, bT, bB, blueball);
-    tryEat(blueball, blueballgrowth, bL, bR, bT, bB, rL, rR, rT, rB, redball); 
+    tryEat(blueball, blueballgrowth, bL, bR, bT, bB, rL, rR, rT, rB, redball);
 
     // ── Win conditions ──────────────────────────────────────────────────────
     var finalRedR = getRadius(redball);
