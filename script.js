@@ -3,16 +3,18 @@
 var gameSpeed = 1
 var P1_advatage = 1
 // Refresh Rate
-var foodRefreshInterval = 15000 / gameSpeed;
-const frameRefreshInterval = 10; // ms
+var foodRefreshInterval = 15000 / gameSpeed; // ms
+var frameRefreshInterval = 10 / gameSpeed;   // ms
 
 // ─── Game Mode ────────────────────────────────────────────────────────────────
-var gameMode = 1; // 1 or 2
+var gameMode = 1; // 0 or 1 or 2
 
-// ─── Ball State ───────────────────────────────────────────────────────────────
+// ─── Game State ───────────────────────────────────────────────────────────────
 var redball = null;
 var blueball = null;
 var foodElements = null;
+var foodIntervalId = null;
+var frameIntervalId = null;
 
 var redballVX = 0, redballVY = 0, redspeed = P1_advatage * gameSpeed * 0.5;
 var redWinsCount = 0, redballX = 0, redballY = 0;
@@ -51,6 +53,7 @@ function init() {
     setupScoreboard();
     updateInstructions();
     spawnfood();
+    startIntervals();
     checkUser();
     loadLeaderboard();
 }
@@ -283,7 +286,13 @@ function spawnfood() {
     }
 }
 
-setInterval(spawnfood, foodRefreshInterval);
+function startIntervals() {
+    if (foodIntervalId) clearInterval(foodIntervalId);
+    if (frameIntervalId) clearInterval(frameIntervalId);
+
+    foodIntervalId = setInterval(spawnfood, 15000 / gameSpeed);
+    frameIntervalId = setInterval(updateBalls, 10 / gameSpeed);
+}
 
 // ─── Movement Functions ───────────────────────────────────────────────────────
 function moveredLeft() { redballVX = -redspeed; redballVY = 0; }
@@ -309,8 +318,16 @@ function getKeyAndMove(e) {
         case 82: fullReset(); break; // R
         //case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // G
         //case 72: P1_advatage += 1; break;                           // H
-        case 189 || 109: gameSpeed = Math.max(gameSpeed - 1, 1); break; // -
-        case 187 || 107: gameSpeed += 1; break;                           // +
+        case 189: // -
+        case 109: // - (numpad)
+            gameSpeed = Math.max(gameSpeed - 1, 1);
+            startIntervals();
+            break;
+        case 187: // +
+        case 107: // + (numpad)
+            gameSpeed = Math.min(gameSpeed + 1, 10);
+            startIntervals();
+            break;
 
         case 37: // left arrow
             if (gameMode === 2) moveblueLeft(); else moveredLeft();
@@ -614,5 +631,3 @@ function updateBalls() {
     // Respawn food if exhausted
     if (foodElements.length === 0) spawnfood();
 }
-
-setInterval(updateBalls, frameRefreshInterval);
