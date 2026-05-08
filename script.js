@@ -689,17 +689,15 @@ function updateBalls() {
     if (gameMode === 1 && stopwatchRunning) updateAIp2();
 
     // Update positions
-    redballX += redballVX * gameSpeed; redballY += redballVY * gameSpeed;
+    gameSpeedRed = Math.max(redR,gameSpeed); // Ensure i don't miss food
+    gameSpeedBlue = Math.max(blueR,gameSpeed);
+    redballX += redballVX * gameSpeedRed; redballY += redballVY * gameSpeedRed;
     redball.style.left = redballX + "px";
     redball.style.top = redballY + "px";
 
-    blueballX += blueballVX * gameSpeed; blueballY += blueballVY * gameSpeed;
+    blueballX += blueballVX * gameSpeedBlue; blueballY += blueballVY * gameSpeedBlue;
     blueball.style.left = blueballX + "px";
     blueball.style.top = blueballY + "px";
-
-    // Update speeds (proportional to size)
-    redspeed = P1_advatage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
-    bluespeed = ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
 
     // Live stopwatch display (1P)
     if (gameMode === 1 && stopwatchRunning) {
@@ -732,6 +730,11 @@ function updateBalls() {
 
     tryEat(redball, redballgrowth, rL, rR, rT, rB, bL, bR, bT, bB, blueball);
     tryEat(blueball, blueballgrowth, bL, bR, bT, bB, rL, rR, rT, rB, redball);
+
+    
+    // Update speeds (proportional to size)
+    redspeed = P1_advatage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
+    bluespeed = ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
 
     // ── Win conditions ──────────────────────────────────────────────────────
     var finalRedR = getRadius(redball);
