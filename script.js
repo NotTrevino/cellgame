@@ -625,6 +625,7 @@ function redwins() {
         stopwatchStart = Date.now();
         stopwatchRunning = true;
         startIntervals();
+        setupScoreboard();
     } else {
         spawnfood();
     }
@@ -653,6 +654,7 @@ function bluewins() {
         stopwatchStart = Date.now();
         stopwatchRunning = true;
         startIntervals();
+        setupScoreboard();
     } else {
         spawnfood();
     }
