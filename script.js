@@ -56,7 +56,6 @@ function init() {
     updateInstructions();
     spawnfood();
     startIntervals();
-    if (gameMode === 0) { stopwatchStart = Date.now(); stopwatchRunning = true; }
     checkUser();
     loadLeaderboard();
 }
@@ -113,6 +112,7 @@ function fullReset() {
     resetballsize();
     resetballpos();
     setupScoreboard();
+    if (gameMode === 0) { stopwatchStart = Date.now(); stopwatchRunning = true; }
     updateInstructions();
     spawnfood();
 }
@@ -357,10 +357,10 @@ function getKeyAndMove(e) {
     var isMoveKey = false;
 
     switch (key_code) {
-        case 65: if (gameMode != 0) { moveredLeft(); isMoveKey = true; break; }  // A
-        case 87: if (gameMode != 0) { moveredUp(); isMoveKey = true; break; }    // W
-        case 68: if (gameMode != 0) { moveredRight(); isMoveKey = true; break; } // D
-        case 83: if (gameMode != 0) { moveredDown(); isMoveKey = true; break; }  // S
+        case 65: if (gameMode !== 0) { moveredLeft(); isMoveKey = true; break; }  // A
+        case 87: if (gameMode !== 0) { moveredUp(); isMoveKey = true; break; }    // W
+        case 68: if (gameMode !== 0) { moveredRight(); isMoveKey = true; break; } // D
+        case 83: if (gameMode !== 0) { moveredDown(); isMoveKey = true; break; }  // S
         case 82: fullReset(); break; // R
         //case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // G
         //case 72: P1_advatage += 1; break;                           // H
