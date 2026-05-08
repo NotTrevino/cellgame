@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // input.js
 // ─────────────────────────────────────────────────────────────────────────────
-window.getKeyAndMove=function (e) {
+window.getKeyAndMove = function (e) {
     var key_code = e.which || e.keyCode;
     var isMoveKey = false;
 
