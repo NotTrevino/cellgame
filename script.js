@@ -22,9 +22,6 @@ var redWinsCount = 0, redballX = 0, redballY = 0;
 var blueballVX = 0, blueballVY = 0, bluespeed = 0.5;
 var blueWinsCount = 0, blueballX = 680, blueballY = 430;
 
-var pendingReset = false;
-var pendingFull = false;
-
 // ─── Score State ─────────────────────────────────────────────────────────────────
 var stopwatchStart = null;
 var stopwatchRunning = false;
