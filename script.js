@@ -338,7 +338,7 @@ function startIntervals() {
     if (frameIntervalId) clearInterval(frameIntervalId);
 
     foodIntervalId = setInterval(spawnfood, foodRefreshInterval  / gameSpeed);
-    frameIntervalId = setInterval(updateBalls, frameRefreshInterval / gameSpeed);
+    frameIntervalId = setInterval(updateBalls, frameRefreshInterval);
 }
 
 // ─── Movement Functions ───────────────────────────────────────────────────────
@@ -688,7 +688,7 @@ function updateBalls() {
     if (gameMode === 1 && stopwatchRunning) updateAIp2();
 
     // Update positions
-    redballX += redballVX; redballY += redballVY;
+    redballX += redballVX*gameSpeed; redballY += redballVY*gameSpeed;
     redball.style.left = redballX + "px";
     redball.style.top = redballY + "px";
 
