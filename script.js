@@ -22,6 +22,9 @@ var redWinsCount = 0, redballX = 0, redballY = 0;
 var blueballVX = 0, blueballVY = 0, bluespeed = 0.5;
 var blueWinsCount = 0, blueballX = 680, blueballY = 430;
 
+var pendingReset = false;
+var pendingFull = false;
+
 // ─── Score State ─────────────────────────────────────────────────────────────────
 var stopwatchStart = null;
 var stopwatchRunning = false;
@@ -101,6 +104,7 @@ function fullReset(full = true) {
         // Reset win counts
         redWinsCount = 0;
         blueWinsCount = 0;
+        startIntervals();
     }
 
     // Remove all food
@@ -116,7 +120,6 @@ function fullReset(full = true) {
 
     resetballsize();
     resetballpos();
-    startIntervals();
     setupScoreboard();
     if (gameMode === 0) { stopwatchStart = Date.now(); stopwatchRunning = true; }
     updateInstructions();
@@ -722,7 +725,7 @@ function updateBalls() {
 
         if (isNaN(finalBlueR) || (finalRedR === 225 && finalRedR > finalBlueR)) { redwins(); return; }
         else if (isNaN(finalRedR) || (finalBlueR === 225 && finalBlueR > finalRedR)) { bluewins(); return; }
-        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(true); return }
+        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(false); return }
 
         // Respawn food if exhausted
         if (foodElements.length === 0) spawnfood();
