@@ -561,7 +561,7 @@ function resetballpos() {
 
 // ─── Win Functions ────────────────────────────────────────────────────────────
 async function saveScore(ms, username) {
-    if (ms < 2000) return; // basic anti-cheat
+    if (ms < 2000 || gameMode !== 1) return; // basic anti-cheat
     if (!currentUser) return;
 
     // Only accept a provided username, or quietly skip
@@ -601,7 +601,7 @@ function redwins() {
             if (highScore === null || elapsed < highScore) {
                 highScore = elapsed;
                 // Auto-save if logged in and username already set
-                if (currentUser) {
+                if (gameMode === 1 && currentUser) {
                     var storedName = localStorage.getItem("cell_username") ||
                         (currentUser.user_metadata && currentUser.user_metadata.full_name);
                     if (storedName) saveScore(elapsed, storedName).then(loadLeaderboard);
