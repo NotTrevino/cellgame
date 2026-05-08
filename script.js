@@ -622,6 +622,7 @@ function redwins() {
     resetballpos();
     // restart 0P automatically
     if (gameMode === 0) {
+        redWinsCount++;
         stopwatchStart = Date.now();
         stopwatchRunning = true;
         startIntervals();
@@ -651,6 +652,7 @@ function bluewins() {
     resetballpos();
     // restart 0P automatically
     if (gameMode === 0) {
+        blueWinsCount++;
         stopwatchStart = Date.now();
         stopwatchRunning = true;
         startIntervals();
