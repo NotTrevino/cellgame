@@ -184,11 +184,11 @@ function setupScoreboard() {
 
         value1.style.color = "#1a8c1a";
         value1.innerHTML =
-            (highScore !== null ? formatTime(highScore*gameSpeed) : "—")
+            (highScore !== null ? formatTime(highScore)*gameSpeed : "—")
             + " / " +
-            (median !== null ? formatTime(median*gameSpeed) : "—")
+            (median !== null ? formatTime(median)*gameSpeed : "—")
             + " / " +
-            (lowScore !== null ? formatTime(lowScore*gameSpeed) : "—");
+            (lowScore !== null ? formatTime(lowScore)*gameSpeed : "—");
 
         label2.style.color = "#b8860b";
         label2.innerHTML = "Red Win%:";
