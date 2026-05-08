@@ -667,81 +667,83 @@ function bluewins() {
 function updateBalls() {
     if (gameMode === 0 && !stopwatchRunning) return;
     if (gameMode === 1 && !stopwatchRunning) return;
-
-    var redR = getRadius(redball);
-    var blueR = getRadius(blueball);
-
-    // Boundary checks — red
-    if (redballX + redballVX < 0) { redballVX = 0; redballX = 0; }
-    if (redballX + redballVX > 700 - redR * 2) { redballVX = 0; redballX = 700 - redR * 2; }
-    if (redballY + redballVY < 0) { redballVY = 0; redballY = 0; }
-    if (redballY + redballVY > 450 - redR * 2) { redballVY = 0; redballY = 450 - redR * 2; }
-
-    // Boundary checks — blue
-    if (blueballX + blueballVX < 0) { blueballVX = 0; blueballX = 0; }
-    if (blueballX + blueballVX > 700 - blueR * 2) { blueballVX = 0; blueballX = 700 - blueR * 2; }
-    if (blueballY + blueballVY < 0) { blueballVY = 0; blueballY = 0; }
-    if (blueballY + blueballVY > 450 - blueR * 2) { blueballVY = 0; blueballY = 450 - blueR * 2; }
-
-    // AI movement (2P)
-    if (gameMode === 0 && stopwatchRunning) { updateAIp1(); updateAIp2(); }
-    // AI movement (1P only)
-    if (gameMode === 1 && stopwatchRunning) updateAIp2();
-
-    // Update positions
-    redballX += Math.min(redR, redballVX * gameSpeed); redballY += Math.min(redR, redballVY * gameSpeed);
-    redball.style.left = redballX + "px";
-    redball.style.top = redballY + "px";
-
-    blueballX += Math.min(blueR, blueballVX * gameSpeed); blueballY += Math.min(blueR, blueballVY * gameSpeed);
-    blueball.style.left = blueballX + "px";
-    blueball.style.top = blueballY + "px";
-
     // Live stopwatch display (1P)
     if (gameMode === 1 && stopwatchRunning) {
         document.getElementById("value1").innerHTML = formatTime(Date.now() - stopwatchStart);
     }
+    for (var s = 0; s < gameSpeed; s++) {
+        var redR = getRadius(redball);
+        var blueR = getRadius(blueball);
 
-    // ── Food collision ──────────────────────────────────────────────────────
-    var rL = parseInt(redball.style.left), rR = rL + getRadius(redball) * 2;
-    var rT = parseInt(redball.style.top), rB = rT + getRadius(redball) * 2;
-    var bL = parseInt(blueball.style.left), bR = bL + getRadius(blueball) * 2;
-    var bT = parseInt(blueball.style.top), bB = bT + getRadius(blueball) * 2;
+        // Boundary checks — red
+        if (redballX + redballVX < 0) { redballVX = 0; redballX = 0; }
+        if (redballX + redballVX > 700 - redR * 2) { redballVX = 0; redballX = 700 - redR * 2; }
+        if (redballY + redballVY < 0) { redballVY = 0; redballY = 0; }
+        if (redballY + redballVY > 450 - redR * 2) { redballVY = 0; redballY = 450 - redR * 2; }
 
-    for (var i = foodElements.length - 1; i >= 0; i--) {
-        var food = foodElements[i];
-        if (!food) continue;
+        // Boundary checks — blue
+        if (blueballX + blueballVX < 0) { blueballVX = 0; blueballX = 0; }
+        if (blueballX + blueballVX > 700 - blueR * 2) { blueballVX = 0; blueballX = 700 - blueR * 2; }
+        if (blueballY + blueballVY < 0) { blueballVY = 0; blueballY = 0; }
+        if (blueballY + blueballVY > 450 - blueR * 2) { blueballVY = 0; blueballY = 450 - blueR * 2; }
 
-        var fL = parseInt(food.style.left), fR = fL + 10;
-        var fT = parseInt(food.style.top), fB = fT + 10;
+        // AI movement (2P)
+        if (gameMode === 0 && stopwatchRunning) { updateAIp1(); updateAIp2(); }
+        // AI movement (1P only)
+        if (gameMode === 1 && stopwatchRunning) updateAIp2();
 
-        tryEat(redball, redballgrowth, rL, rR, rT, rB, fL, fR, fT, fB, food);
-        tryEat(blueball, blueballgrowth, bL, bR, bT, bB, fL, fR, fT, fB, food);
+        // Update positions
+        redballX += redballVX; redballY += redballVY;
+        redball.style.left = redballX + "px";
+        redball.style.top = redballY + "px";
+
+        blueballX += blueballVX; blueballY += blueR, blueballVY;
+        blueball.style.left = blueballX + "px";
+        blueball.style.top = blueballY + "px";
+
+
+        // ── Food collision ──────────────────────────────────────────────────────
+        var rL = parseInt(redball.style.left), rR = rL + getRadius(redball) * 2;
+        var rT = parseInt(redball.style.top), rB = rT + getRadius(redball) * 2;
+        var bL = parseInt(blueball.style.left), bR = bL + getRadius(blueball) * 2;
+        var bT = parseInt(blueball.style.top), bB = bT + getRadius(blueball) * 2;
+
+        for (var i = foodElements.length - 1; i >= 0; i--) {
+            var food = foodElements[i];
+            if (!food) continue;
+
+            var fL = parseInt(food.style.left), fR = fL + 10;
+            var fT = parseInt(food.style.top), fB = fT + 10;
+
+            tryEat(redball, redballgrowth, rL, rR, rT, rB, fL, fR, fT, fB, food);
+            tryEat(blueball, blueballgrowth, bL, bR, bT, bB, fL, fR, fT, fB, food);
+        }
+
+        // ── Ball-on-ball collision ──────────────────────────────────────────────
+        // Re-read positions after potential growth
+        rL = parseInt(redball.style.left); rR = rL + getRadius(redball) * 2;
+        rT = parseInt(redball.style.top); rB = rT + getRadius(redball) * 2;
+        bL = parseInt(blueball.style.left); bR = bL + getRadius(blueball) * 2;
+        bT = parseInt(blueball.style.top); bB = bT + getRadius(blueball) * 2;
+
+        tryEat(redball, redballgrowth, rL, rR, rT, rB, bL, bR, bT, bB, blueball);
+        tryEat(blueball, blueballgrowth, bL, bR, bT, bB, rL, rR, rT, rB, redball);
+
+
+        // Update speeds (proportional to size)
+        redspeed = P1_advatage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
+        bluespeed = ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
+
+        // ── Win conditions ──────────────────────────────────────────────────────
+        var finalRedR = getRadius(redball);
+        var finalBlueR = getRadius(blueball);
+
+        if (isNaN(finalBlueR) || (finalRedR === 225 && finalRedR > finalBlueR)) { redwins(); return; }
+        if (isNaN(finalRedR) || (finalBlueR === 225 && finalBlueR > finalRedR)) { bluewins(); return; }
+        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(); }
+
+        // Respawn food if exhausted
+        if (foodElements.length === 0) spawnfood();
+        
     }
-
-    // ── Ball-on-ball collision ──────────────────────────────────────────────
-    // Re-read positions after potential growth
-    rL = parseInt(redball.style.left); rR = rL + getRadius(redball) * 2;
-    rT = parseInt(redball.style.top); rB = rT + getRadius(redball) * 2;
-    bL = parseInt(blueball.style.left); bR = bL + getRadius(blueball) * 2;
-    bT = parseInt(blueball.style.top); bB = bT + getRadius(blueball) * 2;
-
-    tryEat(redball, redballgrowth, rL, rR, rT, rB, bL, bR, bT, bB, blueball);
-    tryEat(blueball, blueballgrowth, bL, bR, bT, bB, rL, rR, rT, rB, redball);
-
-
-    // Update speeds (proportional to size)
-    redspeed = P1_advatage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
-    bluespeed = ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
-
-    // ── Win conditions ──────────────────────────────────────────────────────
-    var finalRedR = getRadius(redball);
-    var finalBlueR = getRadius(blueball);
-
-    if (isNaN(finalBlueR) || (finalRedR === 225 && finalRedR > finalBlueR)) { redwins(); return; }
-    if (isNaN(finalRedR) || (finalBlueR === 225 && finalBlueR > finalRedR)) { bluewins(); return; }
-    else if (finalRedR === 225 && finalBlueR === 225) { fullReset(); }
-
-    // Respawn food if exhausted
-    if (foodElements.length === 0) spawnfood();
 }
