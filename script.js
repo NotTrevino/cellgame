@@ -689,11 +689,11 @@ function updateBalls() {
     if (gameMode === 1 && stopwatchRunning) updateAIp2();
 
     // Update positions
-    redballX += Math.max(redR, redballVX * gameSpeed); redballY += Math.max(redR, redballVY * gameSpeed);
+    redballX += Math.min(redR, redballVX * gameSpeed); redballY += Math.min(redR, redballVY * gameSpeed);
     redball.style.left = redballX + "px";
     redball.style.top = redballY + "px";
 
-    blueballX += Math.max(blueR, blueballVX * gameSpeed); blueballY += Math.max(blueR, blueballVY * gameSpeed);
+    blueballX += Math.min(blueR, blueballVX * gameSpeed); blueballY += Math.min(blueR, blueballVY * gameSpeed);
     blueball.style.left = blueballX + "px";
     blueball.style.top = blueballY + "px";
 
