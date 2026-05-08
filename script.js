@@ -561,6 +561,8 @@ function resetballsize() {
 
 function resetballpos() {
     redballX = 0; redballY = 0; redballVX = 0; redballVY = 0;
+    redspeed = P1_advatage * 0.5;
+    bluespeed = 0.5;
     var blueR = getRadius(blueball);
     blueballX = 700 - blueR * 2; blueballY = 450 - blueR * 2; blueballVX = 0; blueballVY = 0;
     redball.style.left = "0px"; redball.style.top = "0px";
@@ -713,8 +715,10 @@ function updateBalls() {
 
 
         // Update speeds (proportional to size)
-        redspeed = P1_advatage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
-        bluespeed = ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
+        var newRS = P1_advatage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
+        var newBS = (1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5;
+        if (!isNaN(newRS)) redspeed = newRS;
+        if (!isNaN(newBS)) bluespeed = newBS;
 
         // ── Win conditions ──────────────────────────────────────────────────────
         var finalRedR = getRadius(redball);
