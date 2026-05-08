@@ -723,7 +723,7 @@ function updateBalls() {
 
         // Update speeds (proportional to size)
         var newRS = P1_advantage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
-        var newBS = P2_advantage * (1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5;
+        var newBS = P2_advantage * ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
         if (!isNaN(newRS)) redspeed = newRS;
         if (!isNaN(newBS)) bluespeed = newBS;
 
