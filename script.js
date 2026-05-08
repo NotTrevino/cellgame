@@ -617,6 +617,11 @@ function redwins() {
         stopwatchRunning = false;
         stopwatchStart = null;
     }
+    // restart 0P automatically
+    if (gameMode === 0) {
+        stopwatchStart = Date.now();
+        stopwatchRunning = true;
+    }
 
     resetballsize();
     resetballpos();
@@ -638,7 +643,11 @@ function bluewins() {
         // Restore last displayed score (or dash if none)
         document.getElementById("value1").innerHTML = lastScore !== null ? formatTime(lastScore) : "—";
     }
-
+    // restart 0P automatically
+    if (gameMode === 0) {
+        stopwatchStart = Date.now();
+        stopwatchRunning = true;
+    }
     resetballsize();
     resetballpos();
     spawnfood();
@@ -646,7 +655,6 @@ function bluewins() {
 
 // ─── Main Update Loop ─────────────────────────────────────────────────────────
 function updateBalls() {
-    console.log(gameMode, stopwatchRunning);
     if (gameMode === 0 && !stopwatchRunning) return;
     if (gameMode === 1 && !stopwatchRunning) return;
 
