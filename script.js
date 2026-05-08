@@ -740,7 +740,7 @@ function updateBalls() {
 
         if (isNaN(finalBlueR) || (finalRedR === 225 && finalRedR > finalBlueR)) { redwins(); return; }
         if (isNaN(finalRedR) || (finalBlueR === 225 && finalBlueR > finalRedR)) { bluewins(); return; }
-        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(); }
+        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(); return}
 
         // Respawn food if exhausted
         if (foodElements.length === 0) spawnfood();
