@@ -697,7 +697,7 @@ function updateBalls() {
         redball.style.left = redballX + "px";
         redball.style.top = redballY + "px";
 
-        blueballX += blueballVX; blueballY += blueR, blueballVY;
+        blueballX += blueballVX; blueballY += blueballVY;
         blueball.style.left = blueballX + "px";
         blueball.style.top = blueballY + "px";
 
