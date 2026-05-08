@@ -22,10 +22,12 @@ var redWinsCount = 0, redballX = 0, redballY = 0;
 var blueballVX = 0, blueballVY = 0, bluespeed = 0.5;
 var blueWinsCount = 0, blueballX = 680, blueballY = 430;
 
-// ─── 1P State ─────────────────────────────────────────────────────────────────
+// ─── Score State ─────────────────────────────────────────────────────────────────
 var stopwatchStart = null;
 var stopwatchRunning = false;
+var scores = [];
 var highScore = null; // best (lowest) ms
+var lowScore = null; // worst (highest) ms
 var lastScore = null; // last winning ms (shown when stopwatch is paused)
 
 const supabaseUrl = "https://znmnnttmddhgavfewwhp.supabase.co";
@@ -78,6 +80,7 @@ try {
 function switchMode(val) {
     gameMode = parseInt(val);
     highScore = null; // fresh high score for new mode
+    lowScore = null;
     lastScore = null;
 
     // Show/hide "Local " prefix
@@ -122,6 +125,22 @@ function ensureBall(id) {
     }
 }
 
+function getMedian(arr) {
+    if (arr.length === 0) return null;
+
+    var sorted = [...arr].sort(function(a, b) {
+        return a - b;
+    });
+
+    var mid = Math.floor(sorted.length / 2);
+
+    if (sorted.length % 2 === 0) {
+        return (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+
+    return sorted[mid];
+}
+
 // ─── Scoreboard ───────────────────────────────────────────────────────────────
 function setupScoreboard() {
     var label1 = document.getElementById("label1");
@@ -129,17 +148,7 @@ function setupScoreboard() {
     var label2 = document.getElementById("label2");
     var value2 = document.getElementById("value2");
 
-    if (gameMode === 2) {
-        label1.style.color = "red";
-        label1.innerHTML = "Red Wins:";
-        value1.style.color = "red";
-        value1.innerHTML = redWinsCount;
-
-        label2.style.color = "blue";
-        label2.innerHTML = "Blue Wins:";
-        value2.style.color = "blue";
-        value2.innerHTML = blueWinsCount;
-    } else {
+    if (gameMode === 1) {
         label1.style.color = "#1a8c1a";
         label1.innerHTML = "Score:";
         value1.style.color = "#1a8c1a";
@@ -150,6 +159,42 @@ function setupScoreboard() {
         value2.style.color = "#b8860b";
         var bestText = highScore !== null ? formatTime(gameSpeed * highScore) : "—";
         value2.innerHTML = bestText + ' <button onclick="submitScore()" style="font-size:12px;vertical-align:middle;margin-left:6px;">Submit</button>';
+    } else if (gameMode === 2) {
+        label1.style.color = "red";
+        label1.innerHTML = "Red Wins:";
+        value1.style.color = "red";
+        value1.innerHTML = redWinsCount;
+
+        label2.style.color = "blue";
+        label2.innerHTML = "Blue Wins:";
+        value2.style.color = "blue";
+        value2.innerHTML = blueWinsCount;
+    } else if (gameMode === 0) {
+
+        var median = getMedian(scores);
+
+        label1.style.color = "#1a8c1a";
+        label1.innerHTML = "Min / Med / Max:";
+
+        value1.style.color = "#1a8c1a";
+        value1.innerHTML =
+            (highScore !== null ? formatTime(highScore) : "—")
+            + " / " +
+            (median !== null ? formatTime(median) : "—")
+            + " / " +
+            (lowScore !== null ? formatTime(lowScore) : "—");
+
+        label2.style.color = "#b8860b";
+        label2.innerHTML = "Red Win%:";
+
+        value2.style.color = "#b8860b";
+
+        var total = redWinsCount + blueWinsCount;
+
+        value2.innerHTML =
+            total > 0
+                ? ((100 * redWinsCount / total).toFixed(2) + "%")
+                : "—";
     }
 }
 
@@ -312,10 +357,10 @@ function getKeyAndMove(e) {
     var isMoveKey = false;
 
     switch (key_code) {
-        case 65: moveredLeft(); isMoveKey = true; break;  // A
-        case 87: moveredUp(); isMoveKey = true; break;    // W
-        case 68: moveredRight(); isMoveKey = true; break; // D
-        case 83: moveredDown(); isMoveKey = true; break;  // S
+        case 65: if (gameMode != 0) { moveredLeft(); isMoveKey = true; break; }  // A
+        case 87: if (gameMode != 0) { moveredUp(); isMoveKey = true; break; }    // W
+        case 68: if (gameMode != 0) { moveredRight(); isMoveKey = true; break; } // D
+        case 83: if (gameMode != 0) { moveredDown(); isMoveKey = true; break; }  // S
         case 82: fullReset(); break; // R
         //case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // G
         //case 72: P1_advatage += 1; break;                           // H
@@ -351,8 +396,48 @@ function getKeyAndMove(e) {
     }
 }
 
+// ─── AI (0P mode) ─────────────────────────────────────────────────────────────
+function updateAIp1() {
+    var redR = getRadius(redball);
+    var blueR = getRadius(blueball);
+    if (isNaN(redR) || isNaN(blueR)) return;
+
+    var redCX = redballX + redR;
+    var redCY = redballY + redR;
+
+    var bestDist = Infinity;
+    var bestDX = 0;
+    var bestDY = 0;
+
+    // Nearest food pellet
+    for (var i = 0; i < foodElements.length; i++) {
+        var f = foodElements[i];
+        var dx = (parseInt(f.style.left) + 5) - redCX;
+        var dy = (parseInt(f.style.top) + 5) - redCY;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < bestDist) { bestDist = d; bestDX = dx; bestDY = dy; }
+    }
+
+    // Chase player if AI is bigger
+    if (redR > blueR) {
+        var dx = (blueballX + blueR) - redCX;
+        var dy = (blueballY + blueR) - redCY;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < bestDist) { bestDist = d; bestDX = dx; bestDY = dy; }
+    }
+
+    // Move one axis toward best target
+    if (bestDist < Infinity) {
+        if (Math.abs(bestDX) >= Math.abs(bestDY)) {
+            if (bestDX > 0) moveredRight(); else if (bestDX < 0) moveredLeft();
+        } else {
+            if (bestDY > 0) moveredDown(); else if (bestDY < 0) moveredUp();
+        }
+    }
+}
+
 // ─── AI (1P mode) ─────────────────────────────────────────────────────────────
-function updateAI() {
+function updateAIp2() {
     var blueR = getRadius(blueball);
     var redR = getRadius(redball);
     if (isNaN(blueR) || isNaN(redR)) return;
@@ -511,6 +596,7 @@ function redwins() {
         if (stopwatchRunning) {
             var elapsed = Date.now() - stopwatchStart;
             lastScore = elapsed;
+            scores.push(elapsed);
             if (highScore === null || elapsed < highScore) {
                 highScore = elapsed;
                 // Auto-save if logged in and username already set
@@ -519,6 +605,9 @@ function redwins() {
                         (currentUser.user_metadata && currentUser.user_metadata.full_name);
                     if (storedName) saveScore(elapsed, storedName).then(loadLeaderboard);
                 }
+            }
+            if (lowScore === null || elapsed > lowScore) {
+                lowScore = elapsed;
             }
             document.getElementById("value1").innerHTML = formatTime(elapsed);
             var bestText = formatTime(highScore);
@@ -556,6 +645,7 @@ function bluewins() {
 
 // ─── Main Update Loop ─────────────────────────────────────────────────────────
 function updateBalls() {
+    if (gameMode === 0 && !stopwatchRunning) return;
     if (gameMode === 1 && !stopwatchRunning) return;
 
     var redR = getRadius(redball);
@@ -573,8 +663,10 @@ function updateBalls() {
     if (blueballY + blueballVY < 0) { blueballVY = 0; blueballY = 0; }
     if (blueballY + blueballVY > 450 - blueR * 2) { blueballVY = 0; blueballY = 450 - blueR * 2; }
 
+    // AI movement (2P)
+    if (gameMode === 0 && stopwatchRunning) { updateAIp1(); updateAIp2(); }
     // AI movement (1P only)
-    if (gameMode === 1 && stopwatchRunning) updateAI();
+    if (gameMode === 1 && stopwatchRunning) updateAIp2();
 
     // Update positions
     redballX += redballVX; redballY += redballVY;
@@ -586,8 +678,8 @@ function updateBalls() {
     blueball.style.top = blueballY + "px";
 
     // Update speeds (proportional to size)
-    redspeed = P1_advatage * gameSpeed * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
-    bluespeed = gameSpeed * ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
+    redspeed = P1_advatage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
+    bluespeed = ((1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5);
 
     // Live stopwatch display (1P)
     if (gameMode === 1 && stopwatchRunning) {
