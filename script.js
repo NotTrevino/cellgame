@@ -347,15 +347,15 @@ function startIntervals() {
 }
 
 // ─── Movement Functions ───────────────────────────────────────────────────────
-function moveredLeft() { redballVX = -redspeed; redballVY = 0; }
-function moveredUp() { redballVY = -redspeed; redballVX = 0; }
-function moveredRight() { redballVX = redspeed; redballVY = 0; }
-function moveredDown() { redballVY = redspeed; redballVX = 0; }
+function moveredLeft() { redballVX = -(isNaN(redspeed) ? P1_advatage * 0.5 : redspeed); redballVY = 0; }
+function moveredUp() { redballVY = -(isNaN(redspeed) ? P1_advatage * 0.5 : redspeed); redballVX = 0; }
+function moveredRight() { redballVX = (isNaN(redspeed) ? P1_advatage * 0.5 : redspeed); redballVY = 0; }
+function moveredDown() { redballVY = (isNaN(redspeed) ? P1_advatage * 0.5 : redspeed); redballVX = 0; }
 
-function moveblueLeft() { blueballVX = -bluespeed; blueballVY = 0; }
-function moveblueUp() { blueballVY = -bluespeed; blueballVX = 0; }
-function moveblueRight() { blueballVX = bluespeed; blueballVY = 0; }
-function moveblueDown() { blueballVY = bluespeed; blueballVX = 0; }
+function moveblueLeft() { blueballVX = -(isNaN(bluespeed) ? 0.5 : bluespeed); blueballVY = 0; }
+function moveblueUp() { blueballVY = -(isNaN(bluespeed) ? 0.5 : bluespeed); blueballVX = 0; }
+function moveblueRight() { blueballVX = (isNaN(bluespeed) ? 0.5 : bluespeed); blueballVY = 0; }
+function moveblueDown() { blueballVY = (isNaN(bluespeed) ? 0.5 : bluespeed); blueballVX = 0; }
 
 // ─── Key Handler ─────────────────────────────────────────────────────────────
 function getKeyAndMove(e) {
@@ -655,9 +655,12 @@ function updateBalls() {
     if (gameMode === 1 && stopwatchRunning) {
         document.getElementById("value1").innerHTML = formatTime(Date.now() - stopwatchStart);
     }
-    console.log("tick");
-    console.log("redXY:",redballX, redballY);
-    console.log("blueXY:",blueballX, blueballY);
+    // NaN position recovery — clears any corruption from prior frames
+    if (isNaN(redballX))  { redballX  = 0;   redballVX  = 0; }
+    if (isNaN(redballY))  { redballY  = 0;   redballVY  = 0; }
+    if (isNaN(blueballX)) { blueballX = 680; blueballVX = 0; }
+    if (isNaN(blueballY)) { blueballY = 430; blueballVY = 0; }
+    
     for (var s = 0; s < gameSpeed; s++) {
         var redR = getRadius(redball);
         var blueR = getRadius(blueball);
