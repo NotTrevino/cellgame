@@ -184,11 +184,11 @@ function setupScoreboard() {
 
         value1.style.color = "#1a8c1a";
         value1.innerHTML =
-            (highScore !== null ? formatTime(highScore)*gameSpeed : "—")
+            (highScore !== null ? formatTime(highScore) * gameSpeed : "—")
             + " / " +
-            (median !== null ? formatTime(median)*gameSpeed : "—")
+            (median !== null ? formatTime(median) * gameSpeed : "—")
             + " / " +
-            (lowScore !== null ? formatTime(lowScore)*gameSpeed : "—");
+            (lowScore !== null ? formatTime(lowScore) * gameSpeed : "—");
 
         label2.style.color = "#b8860b";
         label2.innerHTML = "Red Win%:";
@@ -656,11 +656,11 @@ function updateBalls() {
         document.getElementById("value1").innerHTML = formatTime(Date.now() - stopwatchStart);
     }
     // NaN position recovery — clears any corruption from prior frames
-    if (isNaN(redballX))  { redballX  = 0;   redballVX  = 0; }
-    if (isNaN(redballY))  { redballY  = 0;   redballVY  = 0; }
+    if (isNaN(redballX)) { redballX = 0; redballVX = 0; }
+    if (isNaN(redballY)) { redballY = 0; redballVY = 0; }
     if (isNaN(blueballX)) { blueballX = 680; blueballVX = 0; }
     if (isNaN(blueballY)) { blueballY = 430; blueballVY = 0; }
-    
+
     for (var s = 0; s < gameSpeed; s++) {
         var redR = getRadius(redball);
         var blueR = getRadius(blueball);
