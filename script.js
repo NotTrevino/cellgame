@@ -610,9 +610,10 @@ function redwins() {
             if (lowScore === null || elapsed > lowScore) {
                 lowScore = elapsed;
             }
-            document.getElementById("value1").innerHTML = formatTime(elapsed);
-            var bestText = formatTime(highScore);
-            document.getElementById("value2").innerHTML = bestText + ' <button onclick="submitScore()" style="font-size:12px;vertical-align:middle;margin-left:6px;">Submit</button>';
+            if (gameMode === 1) {
+                document.getElementById("value1").innerHTML = formatTime(elapsed);
+                document.getElementById("value2").innerHTML = formatTime(highScore) + ' <button onclick="submitScore()" style="font-size:12px;vertical-align:middle;margin-left:6px;">Submit</button>';
+            }
         }
         stopwatchRunning = false;
         stopwatchStart = null;
