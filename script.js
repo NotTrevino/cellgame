@@ -676,29 +676,29 @@ function updateBalls() {
         var redR = getRadius(redball);
         var blueR = getRadius(blueball);
 
-        // Boundary checks — red
-        if (redballX + redballVX < 0) { redballVX = 0; redballX = 0; }
-        if (redballX + redballVX > 700 - redR * 2) { redballVX = 0; redballX = 700 - redR * 2; }
-        if (redballY + redballVY < 0) { redballVY = 0; redballY = 0; }
-        if (redballY + redballVY > 450 - redR * 2) { redballVY = 0; redballY = 450 - redR * 2; }
-
-        // Boundary checks — blue
-        if (blueballX + blueballVX < 0) { blueballVX = 0; blueballX = 0; }
-        if (blueballX + blueballVX > 700 - blueR * 2) { blueballVX = 0; blueballX = 700 - blueR * 2; }
-        if (blueballY + blueballVY < 0) { blueballVY = 0; blueballY = 0; }
-        if (blueballY + blueballVY > 450 - blueR * 2) { blueballVY = 0; blueballY = 450 - blueR * 2; }
-
         // AI movement (2P)
         if (gameMode === 0 && stopwatchRunning) { updateAIp1(); updateAIp2(); }
         // AI movement (1P only)
         if (gameMode === 1 && stopwatchRunning) updateAIp2();
 
         // Update positions
-        redballX += redballVX; redballY += redballVY;
+        redballX += redballVX;
+        redballY += redballVY;
+
+        blueballX += blueballVX;
+        blueballY += blueballVY;
+
+        // Clamp positions inside arena
+        redballX = Math.max(0, Math.min(700 - redR * 2, redballX));
+        redballY = Math.max(0, Math.min(450 - redR * 2, redballY));
+
+        blueballX = Math.max(0, Math.min(700 - blueR * 2, blueballX));
+        blueballY = Math.max(0, Math.min(450 - blueR * 2, blueballY));
+
+        // Render
         redball.style.left = redballX + "px";
         redball.style.top = redballY + "px";
 
-        blueballX += blueballVX; blueballY += blueballVY;
         blueball.style.left = blueballX + "px";
         blueball.style.top = blueballY + "px";
 
