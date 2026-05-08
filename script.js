@@ -655,6 +655,9 @@ function updateBalls() {
     if (gameMode === 1 && stopwatchRunning) {
         document.getElementById("value1").innerHTML = formatTime(Date.now() - stopwatchStart);
     }
+    console.log("tick");
+    console.log("redXY:",redballX, redballY);
+    console.log("blueXY:",blueballX, blueballY);
     for (var s = 0; s < gameSpeed; s++) {
         var redR = getRadius(redball);
         var blueR = getRadius(blueball);
