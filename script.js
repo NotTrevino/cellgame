@@ -554,7 +554,8 @@ function resetballsize() {
 
 function resetballpos() {
     redballX = 0; redballY = 0; redballVX = 0; redballVY = 0;
-    blueballX = 680; blueballY = 430; blueballVX = 0; blueballVY = 0;
+    var blueR = getRadius(blueball);
+    blueballX = 700 - blueR * 2; blueballY = 450 - blueR * 2; blueballVX = 0; blueballVY = 0;
     redball.style.left = "0px"; redball.style.top = "0px";
     blueball.style.left = "680px"; blueball.style.top = "430px";
 }
@@ -740,10 +741,10 @@ function updateBalls() {
 
         if (isNaN(finalBlueR) || (finalRedR === 225 && finalRedR > finalBlueR)) { redwins(); return; }
         if (isNaN(finalRedR) || (finalBlueR === 225 && finalBlueR > finalRedR)) { bluewins(); return; }
-        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(); return}
+        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(); return }
 
         // Respawn food if exhausted
         if (foodElements.length === 0) spawnfood();
-        
+
     }
 }
