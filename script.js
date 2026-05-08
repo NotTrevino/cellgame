@@ -313,7 +313,7 @@ function getRadius(ball) {
 }
 
 function formatTime(ms) {
-    return (gameSpeed * ms / 1000).toFixed(2) + "s";
+    return (ms / 1000).toFixed(2) + "s";
 }
 
 // ─── Food Spawning ────────────────────────────────────────────────────────────
