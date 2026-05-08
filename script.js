@@ -1,7 +1,8 @@
 // ─── Config ───────────────────────────────────────────────────────────────────
 // Game Speed
 var gameSpeed = 1
-var P1_advatage = 1
+var P1_advantage = 1
+var P2_advantage = 1
 // Refresh Rate
 var foodRefreshInterval = 15000; // ms
 var frameRefreshInterval = 10;   // ms
@@ -16,10 +17,10 @@ var foodElements = null;
 var foodIntervalId = null;
 var frameIntervalId = null;
 
-var redballVX = 0, redballVY = 0, redspeed = P1_advatage * 0.5;
+var redballVX = 0, redballVY = 0, redspeed = P1_advantage * 0.5;
 var redWinsCount = 0, redballX = 0, redballY = 0;
 
-var blueballVX = 0, blueballVY = 0, bluespeed = 0.5;
+var blueballVX = 0, blueballVY = 0, bluespeed = P2_advantage * 0.5;
 var blueWinsCount = 0, blueballX = 680, blueballY = 430;
 
 // ─── Score State ─────────────────────────────────────────────────────────────────
@@ -184,7 +185,7 @@ function setupScoreboard() {
 
         value1.style.color = "#1a8c1a";
         value1.innerHTML =
-            (highScore !== null ? formatTime(highScore* gameSpeed)  : "—")
+            (highScore !== null ? formatTime(highScore * gameSpeed) : "—")
             + " / " +
             (median !== null ? formatTime(median * gameSpeed) : "—")
             + " / " +
@@ -347,15 +348,15 @@ function startIntervals() {
 }
 
 // ─── Movement Functions ───────────────────────────────────────────────────────
-function moveredLeft() { redballVX = -(isNaN(redspeed) ? P1_advatage * 0.5 : redspeed); redballVY = 0; }
-function moveredUp() { redballVY = -(isNaN(redspeed) ? P1_advatage * 0.5 : redspeed); redballVX = 0; }
-function moveredRight() { redballVX = (isNaN(redspeed) ? P1_advatage * 0.5 : redspeed); redballVY = 0; }
-function moveredDown() { redballVY = (isNaN(redspeed) ? P1_advatage * 0.5 : redspeed); redballVX = 0; }
+function moveredLeft() { redballVX = -(isNaN(redspeed) ? P1_advantage * 0.5 : redspeed); redballVY = 0; }
+function moveredUp() { redballVY = -(isNaN(redspeed) ? P1_advantage * 0.5 : redspeed); redballVX = 0; }
+function moveredRight() { redballVX = (isNaN(redspeed) ? P1_advantage * 0.5 : redspeed); redballVY = 0; }
+function moveredDown() { redballVY = (isNaN(redspeed) ? P1_advantage * 0.5 : redspeed); redballVX = 0; }
 
-function moveblueLeft() { blueballVX = -(isNaN(bluespeed) ? 0.5 : bluespeed); blueballVY = 0; }
-function moveblueUp() { blueballVY = -(isNaN(bluespeed) ? 0.5 : bluespeed); blueballVX = 0; }
-function moveblueRight() { blueballVX = (isNaN(bluespeed) ? 0.5 : bluespeed); blueballVY = 0; }
-function moveblueDown() { blueballVY = (isNaN(bluespeed) ? 0.5 : bluespeed); blueballVX = 0; }
+function moveblueLeft() { blueballVX = -(isNaN(bluespeed) ? P2_advantage * 0.5 : bluespeed); blueballVY = 0; }
+function moveblueUp() { blueballVY = -(isNaN(bluespeed) ? P2_advantage * 0.5 : bluespeed); blueballVX = 0; }
+function moveblueRight() { blueballVX = (isNaN(bluespeed) ? P2_advantage * 0.5 : bluespeed); blueballVY = 0; }
+function moveblueDown() { blueballVY = (isNaN(bluespeed) ? P2_advantage * 0.5 : bluespeed); blueballVX = 0; }
 
 // ─── Key Handler ─────────────────────────────────────────────────────────────
 function getKeyAndMove(e) {
@@ -368,8 +369,8 @@ function getKeyAndMove(e) {
         case 68: if (gameMode !== 0) { moveredRight(); isMoveKey = true; } break; // D
         case 83: if (gameMode !== 0) { moveredDown(); isMoveKey = true; } break;  // S
         case 82: fullReset(); break; // R
-        //case 71: P1_advatage = Math.max(P1_advatage - 1, 1); break; // G
-        //case 72: P1_advatage += 1; break;                           // H
+        //case 71: P1_advantage = Math.max(P1_advantage - 1, 1); break; // G
+        //case 72: P1_advantage += 1; break;                           // H
         case 189: // -
         case 109: // - (numpad)
             gameSpeed = Math.max(gameSpeed - 1, 1);
@@ -561,8 +562,8 @@ function resetballsize() {
 
 function resetballpos() {
     redballX = 0; redballY = 0; redballVX = 0; redballVY = 0;
-    redspeed = P1_advatage * 0.5;
-    bluespeed = 0.5;
+    redspeed = P1_advantage * 0.5;
+    bluespeed = P2_advantage * 0.5;
     var blueR = getRadius(blueball);
     blueballX = 700 - blueR * 2; blueballY = 450 - blueR * 2; blueballVX = 0; blueballVY = 0;
     redball.style.left = "0px"; redball.style.top = "0px";
@@ -721,8 +722,8 @@ function updateBalls() {
 
 
         // Update speeds (proportional to size)
-        var newRS = P1_advatage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
-        var newBS = (1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5;
+        var newRS = P1_advantage * ((1 / (225 - 20)) * (getRadius(redball) - 20) + 0.5);
+        var newBS = P2_advantage * (1 / (225 - 20)) * (getRadius(blueball) - 20) + 0.5;
         if (!isNaN(newRS)) redspeed = newRS;
         if (!isNaN(newBS)) bluespeed = newBS;
 
