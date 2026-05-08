@@ -3,8 +3,8 @@
 var gameSpeed = 1
 var P1_advatage = 1
 // Refresh Rate
-var foodRefreshInterval = 15000 / gameSpeed; // ms
-var frameRefreshInterval = 10 / gameSpeed;   // ms
+var foodRefreshInterval = 15000; // ms
+var frameRefreshInterval = 10;   // ms
 
 // ─── Game Mode ────────────────────────────────────────────────────────────────
 var gameMode = 1; // 0 or 1 or 2
@@ -153,12 +153,12 @@ function setupScoreboard() {
         label1.style.color = "#1a8c1a";
         label1.innerHTML = "Score:";
         value1.style.color = "#1a8c1a";
-        value1.innerHTML = lastScore !== null ? formatTime(gameSpeed * lastScore) : "—";
+        value1.innerHTML = lastScore !== null ? formatTime(lastScore) : "—";
 
         label2.style.color = "#b8860b";
         label2.innerHTML = "Best:";
         value2.style.color = "#b8860b";
-        var bestText = highScore !== null ? formatTime(gameSpeed * highScore) : "—";
+        var bestText = highScore !== null ? formatTime(highScore) : "—";
         value2.innerHTML = bestText + ' <button onclick="submitScore()" style="font-size:12px;vertical-align:middle;margin-left:6px;">Submit</button>';
     } else if (gameMode === 2) {
         label1.style.color = "red";
@@ -313,7 +313,7 @@ function getRadius(ball) {
 }
 
 function formatTime(ms) {
-    return (ms / (1000 * gameSpeed)).toFixed(2) + "s";
+    return (ms / 1000).toFixed(2) + "s";
 }
 
 // ─── Food Spawning ────────────────────────────────────────────────────────────
@@ -337,8 +337,8 @@ function startIntervals() {
     if (foodIntervalId) clearInterval(foodIntervalId);
     if (frameIntervalId) clearInterval(frameIntervalId);
 
-    foodIntervalId = setInterval(spawnfood, 15000 / gameSpeed);
-    frameIntervalId = setInterval(updateBalls, 10 / gameSpeed);
+    foodIntervalId = setInterval(spawnfood, foodRefreshInterval  / gameSpeed);
+    frameIntervalId = setInterval(updateBalls, frameRefreshInterval / gameSpeed);
 }
 
 // ─── Movement Functions ───────────────────────────────────────────────────────
@@ -617,15 +617,17 @@ function redwins() {
         stopwatchRunning = false;
         stopwatchStart = null;
     }
+
+    resetballsize();
+    resetballpos();
     // restart 0P automatically
     if (gameMode === 0) {
         stopwatchStart = Date.now();
         stopwatchRunning = true;
+        startIntervals();
+    } else {
+        spawnfood();
     }
-
-    resetballsize();
-    resetballpos();
-    spawnfood();
 }
 
 function bluewins() {
@@ -643,14 +645,17 @@ function bluewins() {
         // Restore last displayed score (or dash if none)
         document.getElementById("value1").innerHTML = lastScore !== null ? formatTime(lastScore) : "—";
     }
+
+    resetballsize();
+    resetballpos();
     // restart 0P automatically
     if (gameMode === 0) {
         stopwatchStart = Date.now();
         stopwatchRunning = true;
+        startIntervals();
+    } else {
+        spawnfood();
     }
-    resetballsize();
-    resetballpos();
-    spawnfood();
 }
 
 // ─── Main Update Loop ─────────────────────────────────────────────────────────
