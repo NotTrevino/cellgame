@@ -424,7 +424,7 @@ function snapshotFood() {
 
 // px per ms at a given radius for red or blue
 function planSpeed(radius, isRed) {
-    var base = isRed ? P1_advatage : 1;
+    var base = isRed ? P1_advantage : 1;
     var spd  = base * ((1 / (225 - 20)) * (radius - 20) + 0.5);
     return (spd * gameSpeed) / frameRefreshInterval; // px/ms
 }
