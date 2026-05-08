@@ -313,7 +313,7 @@ function getRadius(ball) {
 }
 
 function formatTime(ms) {
-    return (ms / 1000).toFixed(2) + "s";
+    return (gameSpeed * ms / 1000).toFixed(2) + "s";
 }
 
 // ─── Food Spawning ────────────────────────────────────────────────────────────
@@ -337,7 +337,7 @@ function startIntervals() {
     if (foodIntervalId) clearInterval(foodIntervalId);
     if (frameIntervalId) clearInterval(frameIntervalId);
 
-    foodIntervalId = setInterval(spawnfood, foodRefreshInterval  / gameSpeed);
+    foodIntervalId = setInterval(spawnfood, foodRefreshInterval / gameSpeed);
     frameIntervalId = setInterval(updateBalls, frameRefreshInterval);
 }
 
@@ -688,11 +688,11 @@ function updateBalls() {
     if (gameMode === 1 && stopwatchRunning) updateAIp2();
 
     // Update positions
-    redballX += redballVX*gameSpeed; redballY += redballVY*gameSpeed;
+    redballX += redballVX * gameSpeed; redballY += redballVY * gameSpeed;
     redball.style.left = redballX + "px";
     redball.style.top = redballY + "px";
 
-    blueballX += blueballVX*gameSpeed; blueballY += blueballVY*gameSpeed;
+    blueballX += blueballVX * gameSpeed; blueballY += blueballVY * gameSpeed;
     blueball.style.left = blueballX + "px";
     blueball.style.top = blueballY + "px";
 
