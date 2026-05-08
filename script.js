@@ -79,9 +79,6 @@ try {
 // ─── Mode Switching ────────────────────────────────────────────────────────────
 function switchMode(val) {
     gameMode = parseInt(val);
-    highScore = null; // fresh high score for new mode
-    lowScore = null;
-    lastScore = null;
 
     // Show/hide "Local " prefix
     var prefix = document.getElementById("local-prefix");
@@ -90,14 +87,21 @@ function switchMode(val) {
     fullReset();
 }
 
-function fullReset() {
+function fullReset(full = true) {
     // Stop stopwatch
     stopwatchStart = null;
     stopwatchRunning = false;
 
-    // Reset win counts
-    redWinsCount = 0;
-    blueWinsCount = 0;
+    if (full) {
+        // Reset scores
+        scores = [];
+        highScore = null;
+        lowScore = null;
+        lastScore = null;
+        // Reset win counts
+        redWinsCount = 0;
+        blueWinsCount = 0;
+    }
 
     // Remove all food
     var box = document.getElementById("box");
@@ -112,6 +116,7 @@ function fullReset() {
 
     resetballsize();
     resetballpos();
+    startIntervals();
     setupScoreboard();
     if (gameMode === 0) { stopwatchStart = Date.now(); stopwatchRunning = true; }
     updateInstructions();
@@ -618,27 +623,9 @@ function redwins() {
                 document.getElementById("value2").innerHTML = formatTime(highScore) + ' <button onclick="submitScore()" style="font-size:12px;vertical-align:middle;margin-left:6px;">Submit</button>';
             }
         }
-        stopwatchRunning = false;
-        stopwatchStart = null;
     }
-
-    resetballsize();
-    resetballpos();
-    redballVX = redballVY = 0;
-    blueballVX = blueballVY = 0;
-    
-    redball = document.getElementById("redball");
-    blueball = document.getElementById("blueball");
-    // restart 0P automatically
-    if (gameMode === 0) {
-        redWinsCount++;
-        stopwatchStart = Date.now();
-        stopwatchRunning = true;
-        startIntervals();
-        setupScoreboard();
-    } else {
-        spawnfood();
-    }
+    fullReset(false);
+    if (gameMode === 0) redWinsCount++;
 }
 
 function bluewins() {
@@ -651,29 +638,11 @@ function bluewins() {
         document.getElementById("value2").innerHTML = blueWinsCount;
     } else {
         // 1P: AI wins — don't record score, just reset timer
-        stopwatchRunning = false;
-        stopwatchStart = null;
         // Restore last displayed score (or dash if none)
         document.getElementById("value1").innerHTML = lastScore !== null ? formatTime(lastScore) : "—";
     }
-
-    resetballsize();
-    resetballpos();
-    redballVX = redballVY = 0;
-    blueballVX = blueballVY = 0;
-    
-    redball = document.getElementById("redball");
-    blueball = document.getElementById("blueball");
-    // restart 0P automatically
-    if (gameMode === 0) {
-        blueWinsCount++;
-        stopwatchStart = Date.now();
-        stopwatchRunning = true;
-        startIntervals();
-        setupScoreboard();
-    } else {
-        spawnfood();
-    }
+    fullReset(false);
+    if (gameMode === 0) blueWinsCount++;
 }
 
 // ─── Main Update Loop ─────────────────────────────────────────────────────────
@@ -752,8 +721,8 @@ function updateBalls() {
         var finalBlueR = getRadius(blueball);
 
         if (isNaN(finalBlueR) || (finalRedR === 225 && finalRedR > finalBlueR)) { redwins(); return; }
-        if (isNaN(finalRedR) || (finalBlueR === 225 && finalBlueR > finalRedR)) { bluewins(); return; }
-        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(); return }
+        else if (isNaN(finalRedR) || (finalBlueR === 225 && finalBlueR > finalRedR)) { bluewins(); return; }
+        else if (finalRedR === 225 && finalBlueR === 225) { fullReset(true); return }
 
         // Respawn food if exhausted
         if (foodElements.length === 0) spawnfood();
