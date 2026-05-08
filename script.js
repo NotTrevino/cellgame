@@ -624,6 +624,11 @@ function redwins() {
 
     resetballsize();
     resetballpos();
+    redballVX = redballVY = 0;
+    blueballVX = blueballVY = 0;
+    
+    redball = document.getElementById("redball");
+    blueball = document.getElementById("blueball");
     // restart 0P automatically
     if (gameMode === 0) {
         redWinsCount++;
@@ -654,6 +659,11 @@ function bluewins() {
 
     resetballsize();
     resetballpos();
+    redballVX = redballVY = 0;
+    blueballVX = blueballVY = 0;
+    
+    redball = document.getElementById("redball");
+    blueball = document.getElementById("blueball");
     // restart 0P automatically
     if (gameMode === 0) {
         blueWinsCount++;
