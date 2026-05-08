@@ -24,7 +24,7 @@ try {
 
 // ─── Auth Functions ───────────────────────────────────────────────────────────
 window.login = async function () {
-    await sb.auth.signInWithOAuth({
+    await window.sb.auth.signInWithOAuth({
         provider: "google",
         options: {
             redirectTo: "https://nottrevino.github.io/cellgame"
@@ -33,13 +33,13 @@ window.login = async function () {
 };
 
 window.logout = async function () {
-    await sb.auth.signOut();
+    await window.sb.auth.signOut();
     currentUser = null;
     renderAuthBar();
 };
 
 window.checkUser = async function () {
-    const { data: { user } } = await sb.auth.getUser();
+    const { data: { user } } = await window.sb.auth.getUser();
     currentUser = user || null;
     renderAuthBar();
 };
@@ -94,7 +94,7 @@ window.formatTime = function (ms) {
     return (ms / 1000).toFixed(2) + "s";
 };
 window.loadLeaderboard = async function () {
-    const { data, error } = await sb
+    const { data, error } = await window.sb
         .from("scores")
         .select("username, time_ms, user_id")
         .order("time_ms", { ascending: true })
@@ -138,7 +138,7 @@ window.saveScore = async function (ms, username) {
     if (!username) return; // Only accept a provided username, or quietly skip
 
     // Check if existing DB score is already better
-    const { data: existing } = await sb
+    const { data: existing } = await window.sb
         .from("scores")
         .select("time_ms")
         .eq("user_id", currentUser.id)
@@ -146,7 +146,7 @@ window.saveScore = async function (ms, username) {
 
     if (existing && existing.time_ms <= ms) return; // not a new personal best
 
-    await sb.from("scores").upsert({
+    await window.sb.from("scores").upsert({
         user_id: currentUser.id,
         username: username,
         time_ms: ms

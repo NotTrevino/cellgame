@@ -15,7 +15,7 @@ window.init = function () {
         if (prefix) prefix.style.display = (gameMode === 2) ? "inline" : "none";
     }
 
-    resetballpos();
+    resetballs();
     setupScoreboard();
     updateInstructions();
     spawnfood();
@@ -67,8 +67,7 @@ window.fullReset = function (full = true) {
     redball = document.getElementById("redball");
     blueball = document.getElementById("blueball");
 
-    resetballsize();
-    resetballpos();
+    resetballs();
     setupScoreboard();
     updateInstructions();
     spawnfood();

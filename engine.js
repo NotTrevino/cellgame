@@ -134,7 +134,7 @@ window.tryEat = function (ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) 
 };
 
 // ─── Reset Functions ──────────────────────────────────────────────────────────
-window.resetball = function () {
+window.resetballs = function () {
     // ─ ballsize ─
     redball.style.width = "20px";
     redball.style.height = "20px";
