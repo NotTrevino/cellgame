@@ -435,6 +435,7 @@ function updateAIp1() {
             if (bestDY > 0) moveredDown(); else if (bestDY < 0) moveredUp();
         }
     }
+    return true
 }
 
 // ─── AI (1P mode) ─────────────────────────────────────────────────────────────
@@ -475,6 +476,7 @@ function updateAIp2() {
             if (bestDY > 0) moveblueDown(); else if (bestDY < 0) moveblueUp();
         }
     }
+    return true
 }
 
 // ─── Growth Functions ─────────────────────────────────────────────────────────
