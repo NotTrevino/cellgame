@@ -112,7 +112,7 @@ window.tryEat = function (ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) 
         bR >= fR &&
         bL <= fL &&
         bB >= fB &&
-        bT >= fT &&
+        bT <= fT &&
         getRadius(ball) > getRadius(food)
     ) {
         var dirs = "LTRB";
