@@ -4,7 +4,7 @@
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 // Game Speed
-var gameSpeed = 1
+var gameSpeed = 10
 var P1_advantage = 1
 var P2_advantage = 1
 // Refresh Rate
@@ -12,7 +12,7 @@ var foodRefreshInterval = 15000; // ms
 var frameRefreshInterval = 10;   // ms
 
 // ─── Game Mode ────────────────────────────────────────────────────────────────
-var gameMode = 1; // 0 or 1 or 2
+var gameMode = 0; // 0 or 1 or 2
 
 // ─── Game State ───────────────────────────────────────────────────────────────
 var redball = null;

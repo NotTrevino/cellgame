@@ -2,11 +2,11 @@
 // ai.js
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ─── Planner ─────────────────────────────────────────────────────────────────
-var BEAM_WIDTH = 8;
-var foodSnapshot = [];   // {x,y} positions snapshotted at spawnfood time
+// ─── Planner (Anytime NN + 2-opt) ────────────────────────────────────────────
+var foodSnapshot = [];  // {x,y} positions snapshotted at spawnfood time
 var redWaypoints = [];  // ordered {x,y} targets for red AI
-var blueWaypoints = [];  // ordered {x,y} targets for blue AI
+var blueWaypoints = []; // ordered {x,y} targets for blue AI
+var _planGenId = 0;     // incremented each spawn; aborts stale async work
 
 window.snapshotFood = function () {
     foodSnapshot = [];
@@ -23,75 +23,117 @@ window.snapshotFood = function () {
 window.planSpeed = function (radius, isRed) {
     var base = isRed ? P1_advantage : 1;
     var spd = base * ((1 / (225 - 20)) * (radius - 20) + 0.5);
-    return (spd * gameSpeed) / frameRefreshInterval; // px/ms
+    return (spd * gameSpeed) / frameRefreshInterval; // px per ms
 };
 
-// Beam search over food snapshot. Returns ordered [{x,y}] waypoint array.
-window.beamPlan = function (startX, startY, startR, isRed) {
-    var foods = foodSnapshot;
-    var n = foods.length;
-    if (n === 0) return [];
-
-    var horizon = foodRefreshInterval / gameSpeed; // ms until next respawn
-
-    // node: { x, y, r, t, mask, path[] }
-    var beam = [{ x: startX, y: startY, r: startR, t: 0, mask: 0, path: [] }];
-    var best = [];
-
-    for (var depth = 0; depth < n && beam.length > 0; depth++) {
-        var next = [];
-
-        for (var i = 0; i < beam.length; i++) {
-            var nd = beam[i];
-            var spd = planSpeed(nd.r, isRed);
-
-            for (var j = 0; j < n; j++) {
-                if (nd.mask & (1 << j)) continue;
-
-                var dx = foods[j].x - nd.x;
-                var dy = foods[j].y - nd.y;
-                var dt = Math.sqrt(dx * dx + dy * dy) / spd;
-
-                if (nd.t + dt > horizon) continue; // unreachable in time
-
-                var newR = Math.min(nd.r + 1, 224);
-                var newPath = nd.path.concat(j);
-
-                next.push({
-                    x: foods[j].x,
-                    y: foods[j].y,
-                    r: newR,
-                    t: nd.t + dt,
-                    mask: nd.mask | (1 << j),
-                    path: newPath
-                });
-            }
-
-            // Leaf node — update best if this path is longer
-            if (nd.path.length > best.length) best = nd.path;
-        }
-
-        if (next.length === 0) break;
-
-        // Prune to beam width by path length (food collected)
-        next.sort(function (a, b) { return b.path.length - a.path.length; });
-        beam = next.slice(0, BEAM_WIDTH);
-
-        if (beam[0].path.length > best.length) best = beam[0].path;
+// Total travel time for an ordered index array
+window.pathCost = function (order, foods, sx, sy, spd) {
+    var x = sx, y = sy, t = 0;
+    for (var i = 0; i < order.length; i++) {
+        var f  = foods[order[i]];
+        var dx = f.x - x, dy = f.y - y;
+        t += Math.sqrt(dx * dx + dy * dy) / spd;
+        x = f.x; y = f.y;
     }
-
-    return best.map(function (i) { return { x: foods[i].x, y: foods[i].y }; });
+    return t;
 };
 
-// ── Async planning: called at every food spawn ────────────────────────────────
-window.triggerReplan = function () {
-    snapshotFood(); // snapshot runs sync so positions are captured this frame
+// Greedy nearest-neighbor, horizon-filtered reachable set
+window.greedySeed = function (sx, sy, startR, isRed) {
+    var foods   = foodSnapshot;
+    var horizon = foodRefreshInterval / gameSpeed;
+    var spd     = planSpeed(startR, isRed);
+    var unvisited = foods.map(function (_, i) { return i; });
+    var order = [], cx = sx, cy = sy, t = 0;
 
-    setTimeout(function () { // planning runs off the main thread tick
+    while (unvisited.length > 0) {
+        var bestI = -1, bestD = Infinity;
+        for (var i = 0; i < unvisited.length; i++) {
+            var f  = foods[unvisited[i]];
+            var dx = f.x - cx, dy = f.y - cy;
+            var d  = Math.sqrt(dx * dx + dy * dy);
+            if (d < bestD) { bestD = d; bestI = i; }
+        }
+        var dt = bestD / spd;
+        if (t + dt > horizon) break;
+        t += dt;
+        order.push(unvisited.splice(bestI, 1)[0]);
+        cx = foods[order[order.length - 1]].x;
+        cy = foods[order[order.length - 1]].y;
+    }
+    return order;
+};
+
+// One full 2-opt pass — returns { order, cost, improved }
+window.twoOptPass = function (order, foods, sx, sy, spd) {
+    var best      = pathCost(order, foods, sx, sy, spd);
+    var improved  = false;
+    var n         = order.length;
+
+    for (var i = 0; i < n - 1; i++) {
+        for (var j = i + 1; j < n; j++) {
+            var candidate = order.slice(0, i)
+                .concat(order.slice(i, j + 1).reverse())
+                .concat(order.slice(j + 1));
+            var cost = pathCost(candidate, foods, sx, sy, spd);
+            if (cost < best) {
+                order    = candidate;
+                best     = cost;
+                improved = true;
+            }
+        }
+    }
+    return { order: order, cost: best, improved: improved };
+};
+
+// ── Async anytime planning: called at every food spawn ────────────────────────────────
+window.triggerReplan = function () {
+    snapshotFood();
+    var genId = ++_planGenId;
+
+    setTimeout(function () {
+        if (genId !== _planGenId) return;
+
         var rr = getRadius(redball);
         var br = getRadius(blueball);
-        if (!isNaN(rr)) redWaypoints = beamPlan(redballX + rr, redballY + rr, rr, true);
-        if (!isNaN(br)) blueWaypoints = beamPlan(blueballX + br, blueballY + br, br, false);
+        var snap = foodSnapshot.slice(); // local copy for this generation
+
+        // Capture positions at planning time
+        var rsx = redballX  + rr,  rsy = redballY  + rr;
+        var bsx = blueballX + br,  bsy = blueballY + br;
+        var rspd = planSpeed(rr, true);
+        var bspd = planSpeed(br, false);
+
+        // Phase 1 — greedy seed (instant), commit immediately
+        var rOrder = isNaN(rr) ? [] : greedySeed(rsx, rsy, rr, true);
+        var bOrder = isNaN(br) ? [] : greedySeed(bsx, bsy, br, false);
+
+        redWaypoints  = rOrder.map(function (i) { return snap[i]; });
+        blueWaypoints = bOrder.map(function (i) { return snap[i]; });
+
+        // Phase 2 — iterative 2-opt, one pass per tick
+        function improve() {
+            if (genId !== _planGenId) return; // food respawned — abort
+
+            var rRes = twoOptPass(rOrder, snap, rsx, rsy, rspd);
+            var bRes = twoOptPass(bOrder, snap, bsx, bsy, bspd);
+
+            if (rRes.improved) {
+                rOrder = rRes.order;
+                redWaypoints = rOrder.map(function (i) { return snap[i]; });
+            }
+            if (bRes.improved) {
+                bOrder = bRes.order;
+                blueWaypoints = bOrder.map(function (i) { return snap[i]; });
+            }
+
+            // Keep going as long as either side is still finding improvements
+            if (rRes.improved || bRes.improved) {
+                setTimeout(improve, 0);
+            }
+        }
+
+        setTimeout(improve, 0);
     }, 0);
 };
 
