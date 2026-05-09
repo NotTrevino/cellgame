@@ -108,10 +108,6 @@ window.blueballgrowth = function (directions = "LTRB") {
 
 // ─── Eating Logic ─────────────────────────────────────────────────────────────
 window.tryEat = function (ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) {
-    console.log("---- COLLISION CHECK ----\n",
-        "BALL:", bL, bR, bT, bB,"\n",
-        "FOOD:", fL, fR, fT, fB
-    );
     if (
         bR >= fR &&
         bL <= fL &&
@@ -119,6 +115,10 @@ window.tryEat = function (ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) 
         bT >= fT &&
         getRadius(ball) > getRadius(food)
     ) {
+        console.log("---- COLLISION CHECK ----\n",
+            "BALL:", bL, bR, bT, bB,"\n",
+            "FOOD:", fL, fR, fT, fB
+        );
         var dirs = "LTRB";
 
         var bCenterX = (bL + bR) / 2;
