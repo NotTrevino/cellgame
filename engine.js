@@ -106,6 +106,7 @@ window.blueballgrowth = function (directions = "LTRB") {
     if (blueballY < 0) blueballY = 0; // Top
 };
 
+var fail = [];
 // ─── Eating Logic ─────────────────────────────────────────────────────────────
 window.tryEat = function (ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) {
     if (
@@ -131,7 +132,7 @@ window.tryEat = function (ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) 
         if (fL > bCenterX) dirs = dirs.replace("L", ""); // food right of center
 
         growthFn(dirs);
-        food.remove();
+        if (food.parentNode) food.remove();
         return true;
     }
     return false;
