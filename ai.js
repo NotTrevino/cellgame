@@ -5,7 +5,7 @@
 // ─── Planner (Anytime Orienteering — growth-aware, opponent-aware) ────────────────────────────────────────────
 var foodSnapshot = [];  // {x,y} positions snapshotted at spawnfood time
 var redWaypoints = [];  // ordered {x,y} targets for red AI
-var blueWaypoints = []; // ordered {x,y} targets for blue AI
+var blueWaypoints = []; // ordered {x,y} targets for red AI's prediction of blue AI
 var _planGenId = 0;     // incremented each spawn; aborts stale async work
 
 window.snapshotFood = function () {
