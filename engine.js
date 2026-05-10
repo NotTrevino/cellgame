@@ -128,8 +128,11 @@ window.tryEat = function (ball, growthFn, bL, bR, bT, bB, fL, fR, fT, fB, food) 
 
         growthFn(dirs);
         if (food.parentNode) food.remove();
+        triggerReplan();
+        rebuildBlueFoodChain();
         return true;
     }
+    
     return false;
 };
 
@@ -186,8 +189,8 @@ window.redwins = function () {
             }
         }
     }
-    fullReset(false);
     if (gameMode === 0) redWinsCount++;
+    fullReset(false);
 };
 
 window.bluewins = function () {
@@ -203,8 +206,8 @@ window.bluewins = function () {
         // Restore last displayed score (or dash if none)
         document.getElementById("value1").innerHTML = lastScore !== null ? formatTime(lastScore) : "—";
     }
-    fullReset(false);
     if (gameMode === 0) blueWinsCount++;
+    fullReset(false);
 };
 
 // ─── Main Game Loop ───────────────────────────────────────────────────────────
@@ -298,4 +301,5 @@ window.updateBalls = function () {
         if (foodElements.length === 0) spawnfood();
 
     }
+    drawPaths();
 };

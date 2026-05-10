@@ -58,14 +58,14 @@ window.fullReset = function (full = true) {
 
     // Remove all food
     var box = document.getElementById("box");
-    var foods = Array.from(box.getElementsByClassName("food"));
-    foods.forEach(function (f) { f.remove(); });
+    box.replaceChildren();
 
     // Ensure both balls exist in the DOM
     ensureBall("redball");
     ensureBall("blueball");
     redball = document.getElementById("redball");
     blueball = document.getElementById("blueball");
+    if (gameMode === 0) ensurePathCanvas("path-canvas");
 
     resetballs();
     setupScoreboard();
@@ -81,6 +81,15 @@ window.ensureBall = function (id) {
         document.getElementById("box").appendChild(ball);
     }
 };
+window.ensurePathCanvas = function (id) {
+    if (!document.getElementById("path-canvas")) {
+        var canvas = document.createElement("canvas");
+        canvas.id = "path-canvas";
+        canvas.width = 700;
+        canvas.height = 450;
+        document.getElementById("box").appendChild(canvas);
+    }
+}
 
 window.getMedian = function (arr) {
     if (arr.length === 0) return null;
@@ -182,6 +191,7 @@ window.spawnfood = function () {
         food.style.top = Math.floor(Math.random() * maxY) + "px";
     }
     triggerReplan();
+    rebuildBlueFoodChain();
 };
 
 window.startIntervals = function () {
@@ -190,4 +200,31 @@ window.startIntervals = function () {
 
     foodIntervalId = setInterval(spawnfood, foodRefreshInterval / gameSpeed);
     frameIntervalId = setInterval(updateBalls, frameRefreshInterval);
+};
+
+window.drawPaths = function () {
+    var canvas = document.getElementById("path-canvas");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, 700, 450);
+
+    var redR = getRadius(redball);
+    var blueR = getRadius(blueball);
+
+    function drawLine(waypoints, cx, cy, color) {
+        if (!waypoints.length) return;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        for (var i = 0; i < waypoints.length; i++)
+            ctx.lineTo(waypoints[i].x, waypoints[i].y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+    if (gameMode === 0) {
+        if (!isNaN(redR)) drawLine(redWaypoints, redballX + redR, redballY + redR, "red");
+        if (!isNaN(blueR)) drawLine(blueFoodChain, blueballX + blueR, blueballY + blueR, "blue");
+    }
 };
