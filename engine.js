@@ -4,7 +4,7 @@
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 // Game Speed
-var gameSpeed = 10
+var gameSpeed = 1
 var P1_advantage = 1
 var P2_advantage = 1
 // Refresh Rate
